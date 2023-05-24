@@ -38,6 +38,23 @@ type server struct {
 	pb.UnimplementedGetUsersServer
 }
 
+// Function to generate sample users
+func generateSampleUsers(count int) []User {
+	users := make([]User, count)
+
+	for i := 0; i < count; i++ {
+		users[i] = User{
+			ID:        string(i + 1),
+			Name:      fmt.Sprintf("User%d", i+1),
+			Family:    fmt.Sprintf("Smith%d", i+1),
+			Age:       25,
+			Sex:       "Male",
+			CreatedAt: time.Now(),
+		}
+	}
+
+	return users
+}
 func DatabaseConnection() {
 	host := "localhost"
 	port := 5432
@@ -53,9 +70,28 @@ func DatabaseConnection() {
 	if err != nil {
 		log.Fatal("Error connecting to the database...", err)
 	}
+
+	// Check if the table is empty
+	var count int64
+	DB.Model(&User{}).Count(&count)
+
+	if count == 0 {
+		// Insert sample records
+		sampleUsers := generateSampleUsers(200)
+
+		for _, user := range sampleUsers {
+			if err := DB.Create(&user).Error; err != nil {
+				log.Fatal("Error inserting sample records...", err)
+			}
+		}
+
+		fmt.Println("Sample records inserted successfully.")
+	}
+
 	fmt.Println("Database connection successful...")
 
 }
+
 func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataResponse, error) {
 	fmt.Print("get request", req.UserId)
 	var user User
