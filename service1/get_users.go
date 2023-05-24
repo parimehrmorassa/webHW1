@@ -8,7 +8,7 @@ import (
 	"net"
 	"time"
 
-	pb "service1/get_user/pb"
+	pb "github.com/royadaneshi/webHW1/service1/get_user/pb"
 
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
