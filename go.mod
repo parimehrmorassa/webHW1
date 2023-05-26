@@ -9,6 +9,7 @@ require (
 	gorm.io/gorm v1.25.1
 )
 
+
 require (
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect

@@ -94,6 +94,7 @@ func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataRe
 	fmt.Print("get request", req.UserId)
 	var user User
 
+	
 	res := DB.Find(&user, "id = ?", req.UserId)
 
 	if res.Error != nil {

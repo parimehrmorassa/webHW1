@@ -66,6 +66,7 @@ func RegisterGetUsersServer(s grpc.ServiceRegistrar, srv GetUsersServer) {
 	s.RegisterService(&GetUsers_ServiceDesc, srv)
 }
 
+
 func _GetUsers_GetData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDataRequest)
 	if err := dec(in); err != nil {
