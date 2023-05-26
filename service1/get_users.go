@@ -22,7 +22,7 @@ var DB *gorm.DB
 var err error
 
 type User struct {
-	ID        int32 `gorm:"primarykey"`
+	Id        int32 `gorm:"primarykey"`
 	Name      string
 	Family    string
 	Age       int32
@@ -41,10 +41,10 @@ type server struct {
 // Function to generate sample users
 func generateSampleUsers(count int) []User {
 	users := make([]User, count)
-
+	fmt.Println("innnn-----------------------")
 	for i := 0; i < count; i++ {
 		users[i] = User{
-			ID:        int32(i + 1),
+			Id:        int32(i + 1),
 			Name:      fmt.Sprintf("User%d", i+1),
 			Family:    fmt.Sprintf("Smith%d", i+1),
 			Age:       25,
@@ -52,8 +52,17 @@ func generateSampleUsers(count int) []User {
 			CreatedAt: time.Now(),
 		}
 	}
+	fmt.Println(users[0], "    <-")
 
 	return users
+}
+func DeleteAllRecords() error {
+	err := DB.Exec("DELETE FROM users").Error
+	if err != nil {
+		return err
+	}
+	fmt.Println("All records deleted successfully.")
+	return nil
 }
 func DatabaseConnection() {
 	host := "localhost"
@@ -74,6 +83,13 @@ func DatabaseConnection() {
 	var count int64
 	DB.Model(&User{}).Count(&count)
 
+	// delete
+	// err := DeleteAllRecords()
+	// if err != nil {
+	// 	log.Fatal("Error deleting records...", err)
+	// }
+	//
+
 	if count == 0 {
 		// Insert sample records
 		sampleUsers := generateSampleUsers(200)
@@ -88,61 +104,59 @@ func DatabaseConnection() {
 	}
 
 	fmt.Println("Database connection successful...")
-	fmt.Println("Database connection successful...")
 
 }
 func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataResponse, error) {
-	fmt.Print("get request", req.UserId)
 	var user User
 
 	res := DB.Find(&user, "id = ?", req.UserId)
-
-	if res.Error != nil {
+	if res.Error != nil || string(user.Id) != string(req.UserId) {
 		// return 100 first users from the table
-		if res.Error == gorm.ErrRecordNotFound {
+		if res.Error == gorm.ErrRecordNotFound || string(user.Id) != string(req.UserId) {
 			// Handle record not found error
 			fmt.Println("get 100 first records...")
-		} else {
-			// Handle other errors
-			fmt.Println("another error, not get 100 first records...")
-		}
-
-		var rows *sql.Rows
-		rows, err := DB.Raw("SELECT * FROM users LIMIT 100").Rows()
-		if err != nil {
-			return nil, err
-		}
-		defer rows.Close()
-
-		first100Users := make([]*pb.User, 0)
-		for rows.Next() {
-			var data User
-			err := rows.Scan(&data.ID, &data.Name, &data.Family, &data.Age, &data.Sex, &data.CreatedAt)
+			var rows *sql.Rows
+			rows, err := DB.Raw("SELECT id, name, family, age, sex, created_at FROM users LIMIT 100").Rows()
 			if err != nil {
 				return nil, err
 			}
-			first100Users = append(first100Users, &pb.User{
-				Id:        int32(data.ID),
-				Name:      data.Name,
-				Family:    data.Family,
-				Age:       int32(data.Age),
-				Sex:       data.Sex,
-				CreatedAt: data.CreatedAt.Format(time.RFC3339),
-			})
+			defer rows.Close()
+			first100Users := make([]*pb.User, 0)
+			for rows.Next() {
+				var data User
+
+				err := rows.Scan(&data.Id, &data.Name, &data.Family, &data.Age, &data.Sex, &data.CreatedAt)
+
+				if err != nil {
+					return nil, err
+				}
+				first100Users = append(first100Users, &pb.User{
+					Id:        int32(data.Id),
+					Name:      data.Name,
+					Family:    data.Family,
+					Age:       int32(data.Age),
+					Sex:       data.Sex,
+					CreatedAt: data.CreatedAt.Format(time.RFC3339),
+				})
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+			return &pb.GetDataResponse{
+				ReturnUsers: first100Users,
+				MessageId:   int32(3),
+			}, nil
+
+		} else {
+			fmt.Println("another error, not get 100 first records...")
 		}
-		if err = rows.Err(); err != nil {
-			return nil, err
-		}
-		return &pb.GetDataResponse{
-			ReturnUsers: first100Users,
-			MessageId:   3,
-		}, nil
+
 	}
 
 	messageIDResponse := int32(1)
 
 	pbUser := &pb.User{
-		Id:        int32(user.ID),
+		Id:        int32(user.Id),
 		Name:      user.Name,
 		Family:    user.Family,
 		Age:       int32(user.Age),

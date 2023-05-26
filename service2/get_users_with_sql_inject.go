@@ -22,7 +22,7 @@ var DB *gorm.DB
 var err error
 
 type User struct {
-	ID        string `gorm:"primarykey"`
+	Id        string `gorm:"primarykey"`
 	Name      string
 	Family    string
 	Age       int32
@@ -31,7 +31,7 @@ type User struct {
 }
 
 var (
-	port = flag.Int("port", 50052, "gRPC server port")
+	port = flag.Int("port", 50053, "gRPC server port")
 )
 
 type server struct {
@@ -41,10 +41,9 @@ type server struct {
 // Function to generate sample users
 func generateSampleUsers(count int) []User {
 	users := make([]User, count)
-
 	for i := 0; i < count; i++ {
 		users[i] = User{
-			ID:        string(i + 1),
+			Id:        string(i + 1),
 			Name:      fmt.Sprintf("User%d", i+1),
 			Family:    fmt.Sprintf("Smith%d", i+1),
 			Age:       25,
@@ -52,8 +51,17 @@ func generateSampleUsers(count int) []User {
 			CreatedAt: time.Now(),
 		}
 	}
+	fmt.Println(users[0], "    <-")
 
 	return users
+}
+func DeleteAllRecords() error {
+	err := DB.Exec("DELETE FROM users").Error
+	if err != nil {
+		return err
+	}
+	fmt.Println("All records deleted successfully.")
+	return nil
 }
 func DatabaseConnection() {
 	host := "localhost"
@@ -62,21 +70,45 @@ func DatabaseConnection() {
 	password := "web14022"
 	dbName := "hw1"
 
+	// Create a new DB instance
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
 		host, port, user, password, dbName)
-
 	DB, err = gorm.Open(postgres.Open(connStr), &gorm.Config{})
-	DB.AutoMigrate(User{})
 	if err != nil {
 		log.Fatal("Error connecting to the database...", err)
 	}
+
+	// Check if the table exists
+	var tableExists bool
+	DB.Raw("SELECT EXISTS (SELECT FROM pg_tables WHERE tablename = 'users_with_sql_injection')").Scan(&tableExists)
+
+	if !tableExists {
+		err = DB.Exec(`CREATE TABLE users_with_sql_injection (
+			id SERIAL PRIMARY KEY,
+			name VARCHAR(255),
+			family VARCHAR(255),
+			age INT,
+			sex VARCHAR(255),
+			created_at TIMESTAMP
+		)`).Error
+		if err != nil {
+			log.Fatal("Error creating table...", err)
+		}
+	}
+
+	DB.AutoMigrate(User{})
 
 	// Check if the table is empty
 	var count int64
 	DB.Model(&User{}).Count(&count)
 
+	// delete
+	// err := DeleteAllRecords()
+	// if err != nil {
+	// 	log.Fatal("Error deleting records...", err)
+	// }
+	//
 	if count == 0 {
-		// Insert sample records
 		sampleUsers := generateSampleUsers(200)
 
 		for _, user := range sampleUsers {
@@ -91,64 +123,58 @@ func DatabaseConnection() {
 	fmt.Println("Database connection successful...")
 
 }
-
 func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataResponse, error) {
-	fmt.Print("get request", req.UserId)
 	var user User
-
+	fmt.Println(req.UserId, " req.UserId...")
 	res := DB.Find(&user, "id = "+req.UserId)
 
-	if res.Error != nil {
+	if res.Error != nil || string(user.Id) != string(req.UserId) {
 		// return 100 first users from the table
-		if res.Error == gorm.ErrRecordNotFound {
+		if res.Error == gorm.ErrRecordNotFound || string(user.Id) != string(req.UserId) {
 			// Handle record not found error
 			fmt.Println("get 100 first records...")
+			var rows *sql.Rows
+			rows, err := DB.Raw("SELECT id, name, family, age, sex, created_at FROM users LIMIT 100").Rows()
+			if err != nil {
+				return nil, err
+			}
+			defer rows.Close()
+			first100Users := make([]*pb.User, 0)
+			for rows.Next() {
+				var data User
+
+				err := rows.Scan(&data.Id, &data.Name, &data.Family, &data.Age, &data.Sex, &data.CreatedAt)
+
+				if err != nil {
+					return nil, err
+				}
+				first100Users = append(first100Users, &pb.User{
+					Id:        string(data.Id),
+					Name:      data.Name,
+					Family:    data.Family,
+					Age:       int32(data.Age),
+					Sex:       data.Sex,
+					CreatedAt: data.CreatedAt.Format(time.RFC3339),
+				})
+			}
+			if err = rows.Err(); err != nil {
+				return nil, err
+			}
+			return &pb.GetDataResponse{
+				ReturnUsers: first100Users,
+				MessageId:   int32(3),
+			}, nil
+
 		} else {
-			// Handle other errors
 			fmt.Println("another error, not get 100 first records...")
 		}
 
-		var rows *sql.Rows
-		rows, err := DB.Raw("SELECT * FROM users LIMIT 100").Rows()
-		if err != nil {
-			fmt.Println("111111111111")
-			return nil, err
-		}
-		defer rows.Close()
-
-		first100Users := make([]*pb.User, 0)
-		for rows.Next() {
-			var data User
-			err := rows.Scan(&data.ID, &data.Name, &data.Family, &data.Age, &data.Sex, &data.CreatedAt)
-			if err != nil {
-				fmt.Println("222222222222222")
-
-				return nil, err
-			}
-			first100Users = append(first100Users, &pb.User{
-				Id:        string(data.ID),
-				Name:      data.Name,
-				Family:    data.Family,
-				Age:       int32(data.Age),
-				Sex:       data.Sex,
-				CreatedAt: data.CreatedAt.Format(time.RFC3339),
-			})
-		}
-		if err = rows.Err(); err != nil {
-			fmt.Println("333333333333")
-
-			return nil, err
-		}
-		return &pb.GetDataResponse{
-			ReturnUsers: first100Users,
-			MessageId:   3,
-		}, nil
 	}
 
 	messageIDResponse := int32(1)
 
 	pbUser := &pb.User{
-		Id:        string(user.ID),
+		Id:        string(user.Id),
 		Name:      user.Name,
 		Family:    user.Family,
 		Age:       int32(user.Age),
