@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	authpb "/Users/parimehrsmacbook/webHW1/service3" // Import the generated protobuf code for the Auth service
+	authpb "github.com/parimehrmorassa/webHW1/service3" // Import the generated protobuf code for the Auth service
 
 	"google.golang.org/grpc"
 )
