@@ -1,0 +1,57 @@
+// syntax = "proto3";
+
+// package auth;
+
+// message DiffieHellmanKeyExchange {
+//   bytes public_key = 1;
+// }
+
+// message AuthenticateRequest {
+//   string nonce = 1;
+//   int32 message_id = 2;
+// }
+
+// message AuthenticateResponse {
+//   string nonce = 1;
+//   string server_nonce = 2;
+//   int32 message_id = 3;
+// }
+
+// message DiffieHellmanParameters {
+//   string p = 1;
+//   string g = 2;
+// }
+
+// service AuthService {
+//   rpc PerformKeyExchange(DiffieHellmanKeyExchange) returns (DiffieHellmanKeyExchange);
+//   rpc Authenticate(AuthenticateRequest) returns (AuthenticateResponse);
+//   rpc GetDiffieHellmanParameters(Empty) returns (DiffieHellmanParameters);
+// }
+
+syntax = "proto3";
+
+package auth;
+
+message DiffieHellmanParams {
+  string nonce = 1;
+  string server_nonce = 2;
+  string p = 3;
+  string g = 4;
+}
+
+message RequestParams {
+  string nonce = 1;
+  int32 message_id = 2;
+}
+
+message ResponseParams {
+  string nonce = 1;
+  string server_nonce = 2;
+  int32 message_id = 3;
+}
+
+service AuthService {
+  rpc GetDiffieHellmanParams(RequestParams) returns (DiffieHellmanParams) {}
+  rpc ProcessDiffieHellmanParams(ResponseParams) returns (ResponseParams) {}
+}
+
