@@ -16,6 +16,7 @@ class GrpcUser(User):
         channel = grpc.insecure_channel("localhost:50053")
         self.client = get_users_with_sql_inject_pb2_grpc.get_usersStub(channel)
 
+
     @task
     def get_user(self):
         # Create a request message

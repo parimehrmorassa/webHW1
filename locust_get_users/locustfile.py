@@ -17,10 +17,7 @@ class GrpcUser(User):
 
     @task
     def get_user(self):
-        # Create a request message
         request = get_users_pb2.GetDataRequest(user_id=1)
-
-        # Make request
         response = self.client.GetData(request)
 
         if response.message_id == 1:
