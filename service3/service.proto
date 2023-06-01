@@ -4,20 +4,21 @@ package authservice;
 
 option go_package = "/authservice";
 
+service MyService {
+  rpc MyMethod (MyRequest) returns (MyResponse);
+}
+
 message MyRequest {
   int32 message_id = 1;
   string nonce = 2;
 }
 
 message MyResponse {
-    string nonce = 1;
-    string  server_nonce = 2;
-    int32 message_id = 3;
-    int32 p = 4;
-    int32 g = 5;
-
+  string nonce = 1;
+  string server_nonce = 2;
+  int32 message = 3;
+  int32 p = 4;
+  int32 g = 5;
 }
 
-service MyService {
-  rpc ProcessRequest (MyRequest) returns (MyResponse);
-}
+
