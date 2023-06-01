@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package authservice;
 
-option go_package = "github.com/royadaneshi/webHW1/service3/authservice";
+option go_package = "service3/authservice";
 
 message MyRequest {
   int32 message_id = 1;
