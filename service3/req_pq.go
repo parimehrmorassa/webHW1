@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "github.com/royadaneshi/webHW1/service3/authservice" // Update with the correct package path
+	pb "github.com/kamyartaeb/webHW1/service3/authservice" // Update with the correct package path
 )
 
 type myServiceServer struct{}
