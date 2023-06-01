@@ -23,14 +23,14 @@ func main() {
 
 	// Prepare the request
 	request := &pb.MyRequest{
-		MessageId: 1234, // Replace with your own message ID
+		MessageId: 1234, 
 		Nonce: string(func(l int) []byte {
 			b := make([]byte, l)
 			for i := range b {
 				b[i] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"[rand.Intn(len("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"))]
 			}
 			return b
-		}(rand.Intn(20) + 1)), // Replace with your own generated nonce
+		}(rand.Intn(20) + 1)), 
 	}
 
 	// Send the request to the server
@@ -39,7 +39,5 @@ func main() {
 		log.Fatalf("Failed to process request: %v", err)
 	}
 
-	// Process the response
-	// Replace the following code with your own logic
 	log.Printf("Response: %v", response)
 }

@@ -31,7 +31,7 @@ func NewMyServiceClient(cc grpc.ClientConnInterface) MyServiceClient {
 
 func (c *myServiceClient) ProcessRequest(ctx context.Context, in *MyRequest, opts ...grpc.CallOption) (*MyResponse, error) {
 	out := new(MyResponse)
-	err := c.cc.Invoke(ctx, "/authservice.MyService/ProcessRequest", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/MyService/ProcessRequest", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func _MyService_ProcessRequest_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/authservice.MyService/ProcessRequest",
+		FullMethod: "/MyService/ProcessRequest",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MyServiceServer).ProcessRequest(ctx, req.(*MyRequest))
@@ -88,7 +88,7 @@ func _MyService_ProcessRequest_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var MyService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "authservice.MyService",
+	ServiceName: "MyService",
 	HandlerType: (*MyServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -97,5 +97,5 @@ var MyService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "service.proto",
+	Metadata: "auth.proto",
 }

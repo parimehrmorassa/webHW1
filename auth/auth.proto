@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-package authservice;
-
 option go_package = "/authservice";
 
 message MyRequest {
@@ -13,7 +11,7 @@ message MyResponse {
     string nonce = 1;
     string  server_nonce = 2;
     int32 message_id = 3;
-    int32 p = 4;
+    int64 p = 4;
     int32 g = 5;
 
 }

@@ -10,8 +10,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"google.golang.org/grpc"
 
-	Auth_service "github.com/royadaneshi/webHW1/auth_service/auth/pb" //should changeee
 	grpcService_get_users "github.com/royadaneshi/webHW1/service1/get_user/pb"
+	Auth_service "github.com/royadaneshi/webHW1/service3/authservice"
 )
 
 const (
@@ -30,7 +30,7 @@ var (
 
 func getAuthKey() (string, error) {
 	// call  Auth service
-	authResponse, err := clientAuth.GetAuthKey(context.Background(), &Auth_service.AuthRequest{})
+	authResponse, err := clientAuth.GetAuthKey(context.Background(), &Auth_service.MyRequest{})
 	if err != nil {
 		return "", err
 	}
@@ -97,7 +97,7 @@ func main() {
 	go cleanupBlacklist()
 
 	// Connect to the Auth service
-	grpcAddressAuth := "localhost:50054" //should changeee
+	grpcAddressAuth := "localhost:50052" //auth port
 	connAuth, errAuth := grpc.Dial(grpcAddressAuth, grpc.WithInsecure())
 	if errAuth != nil {
 		log.Fatalf("Failed to connect to Auth server: %v", errAuth)
@@ -106,10 +106,8 @@ func main() {
 
 	clientAuth = Auth_service.NewAuthClient(connAuth)
 
-	// rate limiting and IP banning
 	router.Use(authenticateIP)
 
-	// Call the Auth service to get the auth key
 	x, y := getAuthKey()
 	AuthKey_get = x
 	err := y
