@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package authservice;
+
+option go_package = "github.com/kamyartaeb/webHW1/service3/authservice";
+
+message MyRequest {
+  int32 message_id = 1;
+  string nonce = 2;
+}
+
+message MyResponse {
+  // Define your response message here
+}
+
+service MyService {
+  rpc ProcessRequest (MyRequest) returns (MyResponse);
+}
