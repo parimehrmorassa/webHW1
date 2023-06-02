@@ -13,6 +13,8 @@ import (
 	"math/big"
 	random1 "math/rand"
 
+	"reflect"
+
 	"github.com/gin-gonic/gin"
 	get_user_injection "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
 	"google.golang.org/grpc"
@@ -30,7 +32,6 @@ const (
 var (
 	blacklist   = make(map[string]time.Time)
 	blacklistMu sync.Mutex
-
 	client      grpcService_get_users.GetUsersClient
 	AuthKey_get *big.Int
 )
@@ -249,9 +250,10 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context) {
 		log.Fatalf("Failed to connect to gRPC server: %v", err)
 	}
 	defer conn.Close()
+	fmt.Println("+++++++++++++++++++++++++++++")
+	fmt.Println(reflect.TypeOf(AuthKey_get), "------------")
 
 	client := get_user_injection.NewGetUsersClient(conn)
-
 	request := &get_user_injection.GetDataRequest{
 		UserId:    "1",
 		AuthKey:   AuthKey_get.Bytes(),
@@ -321,11 +323,13 @@ func gatewayHandlerSqlInject(c *gin.Context) {
 	//////////////////////////
 }
 func main() {
+	fmt.Println("@@@@")
 	router := gin.Default()
 	go cleanupBlacklist()
 	// router.Use(authenticateIP)
-
+	fmt.Println("-----============")
 	router.GET("/gateway/get_users", gatewayHandler)
+	fmt.Println("/////////////////////////////")
 	router.GET("/gateway/get_users_with_sql_inject", gatewayHandlerSqlInject)
 	router.Run(":8080")
 }
