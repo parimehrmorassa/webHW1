@@ -6,7 +6,7 @@ service get_users {
   rpc GetData(GetDataRequest) returns (GetDataResponse) {}
 }
 
-message User {
+message Userr {
   int32  id        = 1;
   string name      = 2;
   string family    = 3;
@@ -24,7 +24,7 @@ message GetDataRequest {
 
 
 message GetDataResponse {
-  repeated User return_users = 1;
+  repeated Userr return_users = 1;
   int32    message_id        = 2;
 
 }
