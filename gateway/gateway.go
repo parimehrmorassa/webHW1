@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"crypto/rand"
 	"encoding/base64"
 	"log"
@@ -11,7 +10,6 @@ import (
 
 	"context"
 	"fmt"
-	"log"
 	"math/big"
 	random1 "math/rand"
 
@@ -33,7 +31,6 @@ var (
 	blacklistMu sync.Mutex
 
 	client      grpcService_get_users.GetUsersClient
-	clientAuth  Auth_service.AuthClient
 	AuthKey_get *big.Int
 )
 
@@ -83,7 +80,7 @@ func getAuthKey() (*big.Int, string, int32, error) {
 	// call  Auth service
 	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
 	if err != nil {
-		log.Fatalf("Failed to connect to server: %v", err)
+		log.Fatalf("Failed to connect to auth server: %v", err)
 	}
 	defer conn.Close()
 
@@ -179,21 +176,22 @@ func authenticateIP(c *gin.Context) {
 	}
 }
 
-func gatewayHandler(c *gin.Context) {
-	request := &grpcService_get_users.GetDataRequest{
-		UserId:  10,
-		AuthKey: AuthKey_get,
-	}
+// func gatewayHandler(c *gin.Context) {
 
-	ctx := c.Request.Context()
-	response, err := client.GetData(ctx, request)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+// 	request := &grpcService_get_users.GetDataRequest{
+// 		UserId:  10,
+// 		AuthKey: AuthKey_get,
+// 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": response.ReturnUsers})
-}
+// 	ctx := c.Request.Context()
+// 	response, err := client.GetData(ctx, request)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"data": response.ReturnUsers})
+// }
 func cleanupBlacklist() {
 	for {
 		time.Sleep(time.Minute)
@@ -208,7 +206,7 @@ func cleanupBlacklist() {
 		blacklistMu.Unlock()
 	}
 }
-func BizService(redis_key string, message int32) {
+func BizService(redis_key string, message int32, c *gin.Context) {
 	grpcAddress := "localhost:50051"
 	conn, err := grpc.Dial(grpcAddress, grpc.WithInsecure())
 	if err != nil {
@@ -216,58 +214,47 @@ func BizService(redis_key string, message int32) {
 	}
 	defer conn.Close()
 	client := grpcService_get_users.NewGetUsersClient(conn)
+	// client :=grpcService_get_users.GetUsersClient
 	request := &grpcService_get_users.GetDataRequest{
 		UserId:    10000000,
 		AuthKey:   AuthKey_get,
 		MessageId: message,
 		RedisKey:  redis_key,
 	}
-	response, err := client.GetData(context.Background(), request)
+	response, err := client.GetData(c.Request.Context(), request)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Fatalf("Failed to get data from Biz service : %v", err)
 	}
-	if response.MessageId == 1 {
-		user := response.ReturnUsers[0]
-		fmt.Println("User ID: %d\n", user.Id)
-		fmt.Printf("Name: %s\n", user.Name)
-		fmt.Printf("Family: %s\n", user.Family)
-		fmt.Printf("Age: %d\n", user.Age)
-		fmt.Printf("Sex: %s\n", user.Sex)
-		fmt.Printf("Created At: %s\n", user.CreatedAt)
-	} else if response.MessageId == 3 {
-		for _, user := range response.ReturnUsers {
-			fmt.Printf("User ID: %d\n", user.Id)
-			fmt.Printf("Name: %s\n", user.Name)
-			fmt.Printf("Family: %s\n", user.Family)
-			fmt.Printf("Age: %d\n", user.Age)
-			fmt.Printf("Sex: %s\n", user.Sex)
-			fmt.Printf("Created At: %s\n", user.CreatedAt)
-			fmt.Println("------")
-		}
-	} else {
-		fmt.Println("Unknown response from server")
-	}
+	c.JSON(http.StatusOK, gin.H{"data": response.ReturnUsers})
+
+	// if response.MessageId == 1 {
+	// 	user := response.ReturnUsers[0]
+	// 	fmt.Println("User ID: %d\n", user.Id)
+	// 	fmt.Printf("Name: %s\n", user.Name)
+	// 	fmt.Printf("Family: %s\n", user.Family)
+	// 	fmt.Printf("Age: %d\n", user.Age)
+	// 	fmt.Printf("Sex: %s\n", user.Sex)
+	// 	fmt.Printf("Created At: %s\n", user.CreatedAt)
+	// } else if response.MessageId == 3 {
+	// 	for _, user := range response.ReturnUsers {
+	// 		fmt.Printf("User ID: %d\n", user.Id)
+	// 		fmt.Printf("Name: %s\n", user.Name)
+	// 		fmt.Printf("Family: %s\n", user.Family)
+	// 		fmt.Printf("Age: %d\n", user.Age)
+	// 		fmt.Printf("Sex: %s\n", user.Sex)
+	// 		fmt.Printf("Created At: %s\n", user.CreatedAt)
+	// 		fmt.Println("------")
+	// 	}
+	// } else {
+	// 	fmt.Println("Unknown response from server")
+	// }
 
 }
 func BizServiceWithSqlInject(redis_key string, message int32) {
 
 }
-func main() {
-	router := gin.Default()
-	go cleanupBlacklist()
-
-	// Connect to the Auth service
-	grpcAddressAuth := "localhost:50052" //auth port
-	connAuth, errAuth := grpc.Dial(grpcAddressAuth, grpc.WithInsecure())
-	if errAuth != nil {
-		log.Fatalf("Failed to connect to Auth server: %v", errAuth)
-	}
-	defer connAuth.Close()
-
-	clientAuth = Auth_service.NewAuthClient(connAuth)
-
-	router.Use(authenticateIP)
-
+func login(c *gin.Context) {
 	x, redis_key, message, y := getAuthKey()
 	AuthKey_get = x
 	err := y
@@ -276,11 +263,16 @@ func main() {
 	}
 
 	// Connect to the get_users service
-	BizService(redis_key, message)
+	BizService(redis_key, message, c)
 	//////////////////////////
 	BizServiceWithSqlInject(redis_key, message)
 	//////////////////////////
+}
+func main() {
+	router := gin.Default()
+	go cleanupBlacklist()
+	router.Use(authenticateIP)
 
-	router.GET("/gateway", gatewayHandler)
+	router.GET("/gateway", login)
 	router.Run(":8080")
 }

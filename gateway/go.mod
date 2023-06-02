@@ -20,6 +20,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
+	github.com/royadaneshi/webHW1/auth v0.0.0-20230602082821-69817d5f2188 // indirect
 	github.com/royadaneshi/webHW1/service1 v0.0.0-20230526185532-1d87ee8b238f // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
