@@ -157,7 +157,7 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 					return nil, err
 				}
 				defer rows.Close()
-				first100Users := make([]*pb.User, 0)
+				first100Users := make([]*pb.Userr, 0)
 				for rows.Next() {
 					var data User
 
@@ -166,7 +166,7 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 					if err != nil {
 						return nil, err
 					}
-					first100Users = append(first100Users, &pb.User{
+					first100Users = append(first100Users, &pb.Userr{
 						Id:        int32(data.Id),
 						Name:      data.Name,
 						Family:    data.Family,
@@ -191,7 +191,7 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 
 		messageIDResponse := int32(1)
 
-		pbUser := &pb.User{
+		pbUser := &pb.Userr{
 			Id:        int32(user.Id),
 			Name:      user.Name,
 			Family:    user.Family,
@@ -201,7 +201,7 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 		}
 
 		return &pb.GetDataResponse{
-			ReturnUsers: []*pb.User{pbUser},
+			ReturnUsers: []*pb.Userr{pbUser},
 			MessageId:   messageIDResponse,
 		}, nil
 	}

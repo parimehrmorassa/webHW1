@@ -40,7 +40,7 @@ var (
 type server struct {
 	redisClient *redis.Client
 
-	pb.UnimplementedGetUsersServer
+	pb.UnimplementedGetUsersInjectServer
 }
 
 // Function to generate sample users
@@ -128,7 +128,7 @@ func DatabaseConnection() {
 	fmt.Println("Database connection successful...")
 
 }
-func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataResponse, error) {
+func (*server) GetData(c context.Context, req *pb.GetDataRequestInject) (*pb.GetDataResponseInject, error) {
 	var user User
 	//read redis to get auth key to check validation of the recevied auth key
 	redisClient := redis.NewClient(&redis.Options{
@@ -174,7 +174,7 @@ func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataRe
 					return nil, err
 				}
 				defer rows.Close()
-				first100Users := make([]*pb.User, 0)
+				first100Users := make([]*pb.UserInject, 0)
 				for rows.Next() {
 					var data User
 
@@ -183,7 +183,7 @@ func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataRe
 					if err != nil {
 						return nil, err
 					}
-					first100Users = append(first100Users, &pb.User{
+					first100Users = append(first100Users, &pb.UserInject{
 						Id:        string(data.Id),
 						Name:      data.Name,
 						Family:    data.Family,
@@ -195,7 +195,7 @@ func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataRe
 				if err = rows.Err(); err != nil {
 					return nil, err
 				}
-				return &pb.GetDataResponse{
+				return &pb.GetDataResponseInject{
 					ReturnUsers: first100Users,
 					MessageId:   int32(3),
 				}, nil
@@ -208,7 +208,7 @@ func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataRe
 
 		messageIDResponse := int32(1)
 
-		pbUser := &pb.User{
+		pbUser := &pb.UserInject{
 			Id:        string(user.Id),
 			Name:      user.Name,
 			Family:    user.Family,
@@ -217,8 +217,8 @@ func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataRe
 			CreatedAt: user.CreatedAt.Format(time.RFC3339),
 		}
 
-		return &pb.GetDataResponse{
-			ReturnUsers: []*pb.User{pbUser},
+		return &pb.GetDataResponseInject{
+			ReturnUsers: []*pb.UserInject{pbUser},
 			MessageId:   messageIDResponse,
 		}, nil
 	}
@@ -235,7 +235,7 @@ func main() {
 
 	s := grpc.NewServer()
 
-	pb.RegisterGetUsersServer(s, &server{})
+	pb.RegisterGetUsersInjectServer(s, &server{})
 
 	log.Printf("Server listening at %v", lis.Addr())
 

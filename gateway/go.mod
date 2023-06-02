@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/royadaneshi/webHW1/auth v0.0.0-20230602123352-02113169e278
-	github.com/royadaneshi/webHW1/service1 v0.0.0-20230602135549-0d23df8edbbe
+	github.com/royadaneshi/webHW1/service1 v0.0.0-20230602141934-bf33f18e3362
 	github.com/royadaneshi/webHW1/service2 v0.0.0-20230602140044-aa8aba7a1219
 	google.golang.org/grpc v1.55.0
 )

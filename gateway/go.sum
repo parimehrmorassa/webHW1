@@ -52,6 +52,8 @@ github.com/royadaneshi/webHW1/service1 v0.0.0-20230602084123-b4fe4472bd51 h1:3+u
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230602084123-b4fe4472bd51/go.mod h1:B6iX5doE8L3NclFqzDtofJ4jKbt1SSkw5q/e/GgpqqM=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230602135549-0d23df8edbbe h1:WVfqK4RDiVoRVv/fj2UYoHbWtuuIbCX0hzRKtzFBhKs=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230602135549-0d23df8edbbe/go.mod h1:B6iX5doE8L3NclFqzDtofJ4jKbt1SSkw5q/e/GgpqqM=
+github.com/royadaneshi/webHW1/service1 v0.0.0-20230602141934-bf33f18e3362 h1:Y+Cd+prUUOiLHGQfX8tf1V7w03S4f7CYifAcQI0AiLQ=
+github.com/royadaneshi/webHW1/service1 v0.0.0-20230602141934-bf33f18e3362/go.mod h1:B6iX5doE8L3NclFqzDtofJ4jKbt1SSkw5q/e/GgpqqM=
 github.com/royadaneshi/webHW1/service2 v0.0.0-20230602140044-aa8aba7a1219 h1:7CVVT8g2ALDymNPwh1p6DCaDILWZALGdmn/Sft0tCuE=
 github.com/royadaneshi/webHW1/service2 v0.0.0-20230602140044-aa8aba7a1219/go.mod h1:IyzPT6arqTovB4bt14llrxWRTHHMKdVa2pSRXHho84c=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=

@@ -322,15 +322,11 @@ func gatewayHandlerSqlInject(c *gin.Context) {
 	//////////////////////////
 }
 func main() {
-	fmt.Println("@@@@")
 	router := gin.Default()
 	go cleanupBlacklist()
 	// router.Use(authenticateIP)
 
-	//////////////////////
-	fmt.Println("-----============")
 	router.GET("/gateway/get_users", gatewayHandler)
-	fmt.Println("/////////////////////////////")
 	router.GET("/gateway/get_users_with_sql_inject", gatewayHandlerSqlInject)
 	router.Run(":8080")
 }
