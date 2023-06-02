@@ -18,7 +18,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GetUsersInjectClient interface {
-	GetData(ctx context.Context, in *GetDataRequestInject, opts ...grpc.CallOption) (*GetDataResponseInject, error)
+	GetDataInject(ctx context.Context, in *GetDataRequestInject, opts ...grpc.CallOption) (*GetDataResponseInject, error)
 }
 
 type getUsersInjectClient struct {
@@ -29,9 +29,9 @@ func NewGetUsersInjectClient(cc grpc.ClientConnInterface) GetUsersInjectClient {
 	return &getUsersInjectClient{cc}
 }
 
-func (c *getUsersInjectClient) GetData(ctx context.Context, in *GetDataRequestInject, opts ...grpc.CallOption) (*GetDataResponseInject, error) {
+func (c *getUsersInjectClient) GetDataInject(ctx context.Context, in *GetDataRequestInject, opts ...grpc.CallOption) (*GetDataResponseInject, error) {
 	out := new(GetDataResponseInject)
-	err := c.cc.Invoke(ctx, "/get_users_inject/GetData", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/get_users_inject/GetDataInject", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +42,7 @@ func (c *getUsersInjectClient) GetData(ctx context.Context, in *GetDataRequestIn
 // All implementations must embed UnimplementedGetUsersInjectServer
 // for forward compatibility
 type GetUsersInjectServer interface {
-	GetData(context.Context, *GetDataRequestInject) (*GetDataResponseInject, error)
+	GetDataInject(context.Context, *GetDataRequestInject) (*GetDataResponseInject, error)
 	mustEmbedUnimplementedGetUsersInjectServer()
 }
 
@@ -50,8 +50,8 @@ type GetUsersInjectServer interface {
 type UnimplementedGetUsersInjectServer struct {
 }
 
-func (UnimplementedGetUsersInjectServer) GetData(context.Context, *GetDataRequestInject) (*GetDataResponseInject, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetData not implemented")
+func (UnimplementedGetUsersInjectServer) GetDataInject(context.Context, *GetDataRequestInject) (*GetDataResponseInject, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetDataInject not implemented")
 }
 func (UnimplementedGetUsersInjectServer) mustEmbedUnimplementedGetUsersInjectServer() {}
 
@@ -66,20 +66,20 @@ func RegisterGetUsersInjectServer(s grpc.ServiceRegistrar, srv GetUsersInjectSer
 	s.RegisterService(&GetUsersInject_ServiceDesc, srv)
 }
 
-func _GetUsersInject_GetData_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _GetUsersInject_GetDataInject_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetDataRequestInject)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GetUsersInjectServer).GetData(ctx, in)
+		return srv.(GetUsersInjectServer).GetDataInject(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/get_users_inject/GetData",
+		FullMethod: "/get_users_inject/GetDataInject",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GetUsersInjectServer).GetData(ctx, req.(*GetDataRequestInject))
+		return srv.(GetUsersInjectServer).GetDataInject(ctx, req.(*GetDataRequestInject))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -92,8 +92,8 @@ var GetUsersInject_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GetUsersInjectServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetData",
-			Handler:    _GetUsersInject_GetData_Handler,
+			MethodName: "GetDataInject",
+			Handler:    _GetUsersInject_GetDataInject_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

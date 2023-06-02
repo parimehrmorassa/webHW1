@@ -211,7 +211,7 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 		MessageId: message,
 		RedisKey:  redis_key,
 	}
-	response, err := client.GetData(c.Request.Context(), request)
+	response, err := client.GetDataInject(c.Request.Context(), request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Fatalf("Failed to get data from Biz service : %v", err)
