@@ -253,7 +253,7 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context) {
 	client := get_user_injection.NewGetUsersClient(conn)
 
 	request := &get_user_injection.GetDataRequest{
-		UserId:    1,
+		UserId:    "1",
 		AuthKey:   AuthKey_get.Bytes(),
 		MessageId: message,
 		RedisKey:  redis_key,
