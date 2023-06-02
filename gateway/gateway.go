@@ -34,7 +34,7 @@ var (
 
 	client      grpcService_get_users.GetUsersClient
 	clientAuth  Auth_service.AuthClient
-	AuthKey_get string
+	AuthKey_get *big.Int
 )
 
 func generateNonce(length int) (string, error) {
@@ -79,7 +79,7 @@ type keys struct {
 	sharedKeyClient   *big.Int
 }
 
-func getAuthKey() (string, string, error) {
+func getAuthKey() (*big.Int, string, int32, error) {
 	// call  Auth service
 	conn, err := grpc.Dial("localhost:50052", grpc.WithInsecure())
 	if err != nil {
@@ -124,10 +124,11 @@ func getAuthKey() (string, string, error) {
 	//g^a mod p:
 	public_key := new(big.Int).Exp(g, a, p)
 	client1 := DH_params.NewDHParamsServiceClient(conn1)
+	messageidd := generateEvenNumberGreaterThan(messageID)
 	request1 := &DH_params.DHParamsRequest{
 		Nonce:       response.GetNonce(),
 		ServerNonce: response.GetServerNonce(),
-		MessageId:   generateEvenNumberGreaterThan(messageID),
+		MessageId:   messageidd,
 
 		A: public_key.Int64(),
 	}
@@ -150,7 +151,7 @@ func getAuthKey() (string, string, error) {
 	fmt.Println("Shared Key:", myKeys.sharedKeyClient)
 	redis_key := fmt.Sprintf("%s:%s", response.GetNonce(), response.GetServerNonce())
 
-	return myKeys.sharedKeyClient, redis_key, nil
+	return myKeys.sharedKeyClient, redis_key, messageidd, nil
 }
 
 func authenticateIP(c *gin.Context) {
@@ -207,31 +208,7 @@ func cleanupBlacklist() {
 		blacklistMu.Unlock()
 	}
 }
-
-func main() {
-	router := gin.Default()
-	go cleanupBlacklist()
-
-	// Connect to the Auth service
-	grpcAddressAuth := "localhost:50052" //auth port
-	connAuth, errAuth := grpc.Dial(grpcAddressAuth, grpc.WithInsecure())
-	if errAuth != nil {
-		log.Fatalf("Failed to connect to Auth server: %v", errAuth)
-	}
-	defer connAuth.Close()
-
-	clientAuth = Auth_service.NewAuthClient(connAuth)
-
-	router.Use(authenticateIP)
-
-	x, redis_key, y := getAuthKey()
-	AuthKey_get = x
-	err := y
-	if err != nil {
-		log.Fatalf("Failed to get the auth key: %v", err)
-	}
-
-	// Connect to the get_users service
+func BizService(redis_key string, message int32) {
 	grpcAddress := "localhost:50051"
 	conn, err := grpc.Dial(grpcAddress, grpc.WithInsecure())
 	if err != nil {
@@ -240,11 +217,14 @@ func main() {
 	defer conn.Close()
 	client := grpcService_get_users.NewGetUsersClient(conn)
 	request := &grpcService_get_users.GetDataRequest{
-		UserId: 10000000,
+		UserId:    10000000,
+		AuthKey:   AuthKey_get,
+		MessageId: message,
+		RedisKey:  redis_key,
 	}
 	response, err := client.GetData(context.Background(), request)
 	if err != nil {
-		log.Fatalf("Failed to get data: %v", err)
+		log.Fatalf("Failed to get data from Biz service : %v", err)
 	}
 	if response.MessageId == 1 {
 		user := response.ReturnUsers[0]
@@ -267,6 +247,38 @@ func main() {
 	} else {
 		fmt.Println("Unknown response from server")
 	}
+
+}
+func BizServiceWithSqlInject(redis_key string, message int32) {
+
+}
+func main() {
+	router := gin.Default()
+	go cleanupBlacklist()
+
+	// Connect to the Auth service
+	grpcAddressAuth := "localhost:50052" //auth port
+	connAuth, errAuth := grpc.Dial(grpcAddressAuth, grpc.WithInsecure())
+	if errAuth != nil {
+		log.Fatalf("Failed to connect to Auth server: %v", errAuth)
+	}
+	defer connAuth.Close()
+
+	clientAuth = Auth_service.NewAuthClient(connAuth)
+
+	router.Use(authenticateIP)
+
+	x, redis_key, message, y := getAuthKey()
+	AuthKey_get = x
+	err := y
+	if err != nil {
+		log.Fatalf("Failed to get the auth key: %v", err)
+	}
+
+	// Connect to the get_users service
+	BizService(redis_key, message)
+	//////////////////////////
+	BizServiceWithSqlInject(redis_key, message)
 	//////////////////////////
 
 	router.GET("/gateway", gatewayHandler)

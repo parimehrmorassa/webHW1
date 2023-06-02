@@ -2,12 +2,15 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 	"time"
 
+	"github.com/go-redis/redis/v8"
+	authservice "github.com/royadaneshi/webHW1/auth/authservice"
 	pb "github.com/royadaneshi/webHW1/service1/get_user/pb"
 
 	"google.golang.org/grpc"
@@ -35,6 +38,7 @@ var (
 )
 
 type server struct {
+	redisClient *redis.Client
 	pb.UnimplementedGetUsersServer
 }
 
@@ -106,70 +110,88 @@ func DatabaseConnection() {
 	fmt.Println("Database connection successful...")
 
 }
-func (*server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataResponse, error) {
+
+func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataResponse, error) {
+
 	var user User
-
-	res := DB.Find(&user, "id = ?", req.UserId)
-	if res.Error != nil || string(user.Id) != string(req.UserId) {
-		// return 100 first users from the table
-		if res.Error == gorm.ErrRecordNotFound || string(user.Id) != string(req.UserId) {
-			// Handle record not found error
-			fmt.Println("get 100 first records...")
-			var rows *sql.Rows
-			rows, err := DB.Raw("SELECT id, name, family, age, sex, created_at FROM users LIMIT 100").Rows()
-			if err != nil {
-				return nil, err
-			}
-			defer rows.Close()
-			first100Users := make([]*pb.User, 0)
-			for rows.Next() {
-				var data User
-
-				err := rows.Scan(&data.Id, &data.Name, &data.Family, &data.Age, &data.Sex, &data.CreatedAt)
-
+	//read redis to get auth key to check validation of the recevied auth key
+	value, err := s.redisClient.Get(c, req.RedisKey).Result()
+	if err != nil {
+		log.Printf("Failed to retrieve data from Redis for get authkey: %v", err)
+	}
+	//convert from json
+	byteData := []byte(value)
+	var response authservice.MyResponse
+	err1 := json.Unmarshal(byteData, &response)
+	if err != nil {
+		return nil, err1
+	}
+	if req.AuthKey != response.AuthKey {
+		return nil, fmt.Errorf("invalid auth_key")
+	} else {
+		log.Printf("authentication: valid auth")
+		fmt.Println("authentication: valid auth")
+		res := DB.Find(&user, "id = ?", req.UserId)
+		if res.Error != nil || string(user.Id) != string(req.UserId) {
+			// return 100 first users from the table
+			if res.Error == gorm.ErrRecordNotFound || string(user.Id) != string(req.UserId) {
+				// Handle record not found error
+				fmt.Println("get 100 first records...")
+				var rows *sql.Rows
+				rows, err := DB.Raw("SELECT id, name, family, age, sex, created_at FROM users LIMIT 100").Rows()
 				if err != nil {
 					return nil, err
 				}
-				first100Users = append(first100Users, &pb.User{
-					Id:        int32(data.Id),
-					Name:      data.Name,
-					Family:    data.Family,
-					Age:       int32(data.Age),
-					Sex:       data.Sex,
-					CreatedAt: data.CreatedAt.Format(time.RFC3339),
-				})
-			}
-			if err = rows.Err(); err != nil {
-				return nil, err
-			}
-			return &pb.GetDataResponse{
-				ReturnUsers: first100Users,
-				MessageId:   int32(3),
-			}, nil
+				defer rows.Close()
+				first100Users := make([]*pb.User, 0)
+				for rows.Next() {
+					var data User
 
-		} else {
-			fmt.Println("another error, not get 100 first records...")
+					err := rows.Scan(&data.Id, &data.Name, &data.Family, &data.Age, &data.Sex, &data.CreatedAt)
+
+					if err != nil {
+						return nil, err
+					}
+					first100Users = append(first100Users, &pb.User{
+						Id:        int32(data.Id),
+						Name:      data.Name,
+						Family:    data.Family,
+						Age:       int32(data.Age),
+						Sex:       data.Sex,
+						CreatedAt: data.CreatedAt.Format(time.RFC3339),
+					})
+				}
+				if err = rows.Err(); err != nil {
+					return nil, err
+				}
+				return &pb.GetDataResponse{
+					ReturnUsers: first100Users,
+					MessageId:   int32(3),
+				}, nil
+
+			} else {
+				fmt.Println("another error, not get 100 first records...")
+			}
+
 		}
 
+		messageIDResponse := int32(1)
+
+		pbUser := &pb.User{
+			Id:        int32(user.Id),
+			Name:      user.Name,
+			Family:    user.Family,
+			Age:       int32(user.Age),
+			Sex:       user.Sex,
+			CreatedAt: user.CreatedAt.Format(time.RFC3339),
+		}
+
+		return &pb.GetDataResponse{
+			ReturnUsers: []*pb.User{pbUser},
+			MessageId:   messageIDResponse,
+		}, nil
 	}
-
-	messageIDResponse := int32(1)
-
-	pbUser := &pb.User{
-		Id:        int32(user.Id),
-		Name:      user.Name,
-		Family:    user.Family,
-		Age:       int32(user.Age),
-		Sex:       user.Sex,
-		CreatedAt: user.CreatedAt.Format(time.RFC3339),
-	}
-
-	return &pb.GetDataResponse{
-		ReturnUsers: []*pb.User{pbUser},
-		MessageId:   messageIDResponse,
-	}, nil
 }
-
 func main() {
 	fmt.Println("gRPC server running ...")
 	DatabaseConnection()
