@@ -21,24 +21,6 @@ type server struct {
 	pb.UnimplementedMyServiceServer
 }
 
-// func generateRandomGenerator(p *big.Int) (*big.Int, error) {
-// 	two := big.NewInt(2)
-// 	// Choose a random value for g between 2 and p-2
-// 	g, err := rand.Int(rand.Reader, new(big.Int).Sub(p, two))
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	// make sure g is at least 2
-// 	g.Add(g, two)
-// 	return g, nil
-// }
-// func generateRandomPrime(bits int) (*big.Int, error) {
-// 	p, err := rand.Prime(rand.Reader, bits)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return p, nil
-// }
 func generateOddNumber() int32 {
 	for {
 		num := mrand.Int31n(1000) + 1
@@ -54,17 +36,6 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 	if len(req.Nonce) != 20 {
 		return nil, fmt.Errorf("Invalid nonce length")
 	}
-
-	// p, err := generateRandomPrime(2048)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("Error:", err)
-
-	// }
-
-	// g, err := generateRandomGenerator(p)
-	// if err != nil {
-	// 	return nil, fmt.Errorf("Error:", err)
-	// }
 
 	params := new(dsa.Parameters)
 	err := dsa.GenerateParameters(params, rand.Reader, dsa.L2048N256)

@@ -117,9 +117,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 	// }
 
 	// fmt.Println("Retrieved data:", data)
-	// ////////
 
-	////
 	myKeys := keys{
 		personalKeyServer: b,
 		publicKeyServer:   public_key_B,

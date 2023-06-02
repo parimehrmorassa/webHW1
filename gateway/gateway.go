@@ -115,16 +115,15 @@ func getAuthKey() (*big.Int, string, int32, error) {
 	defer conn1.Close()
 
 	personal_key := int64(random1.Intn(10000))
-	// g := big.NewInt(response.GetG())
+
 	a := big.NewInt(personal_key)
-	// p := big.NewInt(response.GetP())
+
 	g := new(big.Int)
 	g.SetString(response.GetG(), 10)
 
 	p := new(big.Int)
 	p.SetString(response.GetP(), 10)
 
-	// fmt.Print("g:", g, " p:", p, " +++++++++++++++++++++")
 	//g^a mod p:
 	public_key := new(big.Int).Exp(g, a, p)
 	client1 := DH_params.NewDHParamsServiceClient(conn1)
@@ -205,7 +204,7 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 	}
 	defer conn.Close()
 	client := grpcService_get_users.NewGetUsersClient(conn)
-	// client :=grpcService_get_users.GetUsersClient
+
 	request := &grpcService_get_users.GetDataRequest{
 		UserId:    1,
 		AuthKey:   AuthKey_get.Bytes(),
