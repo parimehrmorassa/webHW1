@@ -14,86 +14,86 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// DHParams_ServiceClient is the client API for DHParams_Service service.
+// DHParamsServiceClient is the client API for DHParamsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type DHParams_ServiceClient interface {
-	ProcessRequest(ctx context.Context, in *DHParams_Request, opts ...grpc.CallOption) (*DHParams_Response, error)
+type DHParamsServiceClient interface {
+	ProcessRequest(ctx context.Context, in *DHParamsRequest, opts ...grpc.CallOption) (*DHParamsResponse, error)
 }
 
-type dHParams_ServiceClient struct {
+type dHParamsServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewDHParams_ServiceClient(cc grpc.ClientConnInterface) DHParams_ServiceClient {
-	return &dHParams_ServiceClient{cc}
+func NewDHParamsServiceClient(cc grpc.ClientConnInterface) DHParamsServiceClient {
+	return &dHParamsServiceClient{cc}
 }
 
-func (c *dHParams_ServiceClient) ProcessRequest(ctx context.Context, in *DHParams_Request, opts ...grpc.CallOption) (*DHParams_Response, error) {
-	out := new(DHParams_Response)
-	err := c.cc.Invoke(ctx, "/DH_params_Service/ProcessRequest", in, out, opts...)
+func (c *dHParamsServiceClient) ProcessRequest(ctx context.Context, in *DHParamsRequest, opts ...grpc.CallOption) (*DHParamsResponse, error) {
+	out := new(DHParamsResponse)
+	err := c.cc.Invoke(ctx, "/DHParamsService/ProcessRequest", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// DHParams_ServiceServer is the server API for DHParams_Service service.
-// All implementations must embed UnimplementedDHParams_ServiceServer
+// DHParamsServiceServer is the server API for DHParamsService service.
+// All implementations must embed UnimplementedDHParamsServiceServer
 // for forward compatibility
-type DHParams_ServiceServer interface {
-	ProcessRequest(context.Context, *DHParams_Request) (*DHParams_Response, error)
-	mustEmbedUnimplementedDHParams_ServiceServer()
+type DHParamsServiceServer interface {
+	ProcessRequest(context.Context, *DHParamsRequest) (*DHParamsResponse, error)
+	mustEmbedUnimplementedDHParamsServiceServer()
 }
 
-// UnimplementedDHParams_ServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedDHParams_ServiceServer struct {
+// UnimplementedDHParamsServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedDHParamsServiceServer struct {
 }
 
-func (UnimplementedDHParams_ServiceServer) ProcessRequest(context.Context, *DHParams_Request) (*DHParams_Response, error) {
+func (UnimplementedDHParamsServiceServer) ProcessRequest(context.Context, *DHParamsRequest) (*DHParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ProcessRequest not implemented")
 }
-func (UnimplementedDHParams_ServiceServer) mustEmbedUnimplementedDHParams_ServiceServer() {}
+func (UnimplementedDHParamsServiceServer) mustEmbedUnimplementedDHParamsServiceServer() {}
 
-// UnsafeDHParams_ServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to DHParams_ServiceServer will
+// UnsafeDHParamsServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to DHParamsServiceServer will
 // result in compilation errors.
-type UnsafeDHParams_ServiceServer interface {
-	mustEmbedUnimplementedDHParams_ServiceServer()
+type UnsafeDHParamsServiceServer interface {
+	mustEmbedUnimplementedDHParamsServiceServer()
 }
 
-func RegisterDHParams_ServiceServer(s grpc.ServiceRegistrar, srv DHParams_ServiceServer) {
-	s.RegisterService(&DHParams_Service_ServiceDesc, srv)
+func RegisterDHParamsServiceServer(s grpc.ServiceRegistrar, srv DHParamsServiceServer) {
+	s.RegisterService(&DHParamsService_ServiceDesc, srv)
 }
 
-func _DHParams_Service_ProcessRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DHParams_Request)
+func _DHParamsService_ProcessRequest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DHParamsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(DHParams_ServiceServer).ProcessRequest(ctx, in)
+		return srv.(DHParamsServiceServer).ProcessRequest(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/DH_params_Service/ProcessRequest",
+		FullMethod: "/DHParamsService/ProcessRequest",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DHParams_ServiceServer).ProcessRequest(ctx, req.(*DHParams_Request))
+		return srv.(DHParamsServiceServer).ProcessRequest(ctx, req.(*DHParamsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// DHParams_Service_ServiceDesc is the grpc.ServiceDesc for DHParams_Service service.
+// DHParamsService_ServiceDesc is the grpc.ServiceDesc for DHParamsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var DHParams_Service_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "DH_params_Service",
-	HandlerType: (*DHParams_ServiceServer)(nil),
+var DHParamsService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "DHParamsService",
+	HandlerType: (*DHParamsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "ProcessRequest",
-			Handler:    _DHParams_Service_ProcessRequest_Handler,
+			Handler:    _DHParamsService_ProcessRequest_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

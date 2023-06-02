@@ -91,7 +91,6 @@ func main() {
 		Password: "",
 		DB:       0,
 	})
-
 	s := grpc.NewServer()
 	pb.RegisterDHParamsServiceServer(s, &server{redisClient: client})
 

@@ -12,7 +12,7 @@ message MyResponse {
     string  server_nonce = 2;
     int32 message_id = 3;
     int64 p = 4;
-    int32 g = 5;
+    int64 g = 5;
 
 }
 

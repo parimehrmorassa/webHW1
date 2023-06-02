@@ -6,9 +6,10 @@ import (
 	"fmt"
 	"log"
 	"math/big"
+	mrand "math/rand"
 	"net"
 	"time"
-	mrand "math/rand"
+
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc"
 
@@ -70,7 +71,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 		ServerNonce: generateNonce(),
 		MessageId:   generateOddNumber(),
 		P:           p.Int64(),
-		G:           int32(g.Int64()),
+		G:           g.Int64(),
 	}
 
 	// save to redis
