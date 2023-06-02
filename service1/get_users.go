@@ -6,11 +6,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/big"
 	"net"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	authservice "github.com/royadaneshi/webHW1/auth/authservice"
 	pb "github.com/royadaneshi/webHW1/service1/get_user/pb"
 
 	"google.golang.org/grpc"
@@ -121,14 +121,19 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 	}
 	//convert from json
 	byteData := []byte(value)
-	var response authservice.MyResponse
+	var response *big.Int
 	err1 := json.Unmarshal(byteData, &response)
 	if err != nil {
 		return nil, err1
 	}
-	if req.AuthKey != response.AuthKey {
+
+	authKey := new(big.Int)
+	authKey.SetBytes(req.AuthKey)
+
+	if authKey.Cmp(response) != 0 {
 		return nil, fmt.Errorf("invalid auth_key")
 	} else {
+
 		log.Printf("authentication: valid auth")
 		fmt.Println("authentication: valid auth")
 		res := DB.Find(&user, "id = ?", req.UserId)
