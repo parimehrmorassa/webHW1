@@ -2,19 +2,18 @@ package main
 
 import (
 	"context"
+	"crypto/dsa"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/big"
 	mrand "math/rand"
 	"net"
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	"google.golang.org/grpc"
-
 	pb "github.com/royadaneshi/webHW1/auth/authservice"
+	"google.golang.org/grpc"
 )
 
 type server struct {
@@ -22,24 +21,24 @@ type server struct {
 	pb.UnimplementedMyServiceServer
 }
 
-func generateRandomGenerator(p *big.Int) (*big.Int, error) {
-	two := big.NewInt(2)
-	// Choose a random value for g between 2 and p-2
-	g, err := rand.Int(rand.Reader, new(big.Int).Sub(p, two))
-	if err != nil {
-		return nil, err
-	}
-	// make sure g is at least 2
-	g.Add(g, two)
-	return g, nil
-}
-func generateRandomPrime(bits int) (*big.Int, error) {
-	p, err := rand.Prime(rand.Reader, bits)
-	if err != nil {
-		return nil, err
-	}
-	return p, nil
-}
+// func generateRandomGenerator(p *big.Int) (*big.Int, error) {
+// 	two := big.NewInt(2)
+// 	// Choose a random value for g between 2 and p-2
+// 	g, err := rand.Int(rand.Reader, new(big.Int).Sub(p, two))
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	// make sure g is at least 2
+// 	g.Add(g, two)
+// 	return g, nil
+// }
+// func generateRandomPrime(bits int) (*big.Int, error) {
+// 	p, err := rand.Prime(rand.Reader, bits)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return p, nil
+// }
 func generateOddNumber() int32 {
 	for {
 		num := mrand.Int31n(1000) + 1
@@ -56,23 +55,48 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 		return nil, fmt.Errorf("Invalid nonce length")
 	}
 
-	p, err := generateRandomPrime(2048)
-	if err != nil {
-		return nil, fmt.Errorf("Error:", err)
+	// p, err := generateRandomPrime(2048)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("Error:", err)
 
+	// }
+
+	// g, err := generateRandomGenerator(p)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("Error:", err)
+	// }
+	// privateKey, err := dh.GenerateParameters(rand.Reader, 2048)
+
+	// privateKey, err := dh.GenerateKey(rand.Reader, 2048)
+
+	// privateKey := new(dsa.PrivateKey)
+	// privateKey.Parameters.Generate(rand.Reader, 2048)
+	// parameters := privateKey.Parameters
+
+	// // if err != nil {
+	// // 	return nil, fmt.Errorf("Error generating private key:", err)
+	// // }
+	// g := parameters.G
+	// p := parameters.P
+
+	params := new(dsa.Parameters)
+	err := dsa.GenerateParameters(params, rand.Reader, dsa.L2048N256)
+	if err != nil {
+
+		return nil, fmt.Errorf("Error generating parameters:", err)
 	}
 
-	g, err := generateRandomGenerator(p)
-	if err != nil {
-		return nil, fmt.Errorf("Error:", err)
-	}
-
+	g := params.G
+	p := params.P
+	fmt.Println("P:", p)
+	fmt.Println("G:", g)
+	/////////////////////
 	resp := &pb.MyResponse{
 		Nonce:       req.GetNonce(),
 		ServerNonce: generateNonce(),
 		MessageId:   generateOddNumber(),
-		P:           p.Int64(),
-		G:           g.Int64(),
+		P:           p.int32(),
+		G:           g.int32(),
 	}
 
 	// save to redis

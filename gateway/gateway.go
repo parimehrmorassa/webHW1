@@ -118,6 +118,7 @@ func getAuthKey() (*big.Int, string, int32, error) {
 	g := big.NewInt(response.GetG())
 	a := big.NewInt(personal_key)
 	p := big.NewInt(response.GetP())
+	fmt.Print("g:", g, " p:", p, " +++++++++++++++++++++")
 	//g^a mod p:
 	public_key := new(big.Int).Exp(g, a, p)
 	client1 := DH_params.NewDHParamsServiceClient(conn1)
@@ -145,7 +146,7 @@ func getAuthKey() (*big.Int, string, int32, error) {
 		sharedKeyClient:   shared_key,
 	}
 
-	fmt.Println("Shared Key:", myKeys.sharedKeyClient)
+	fmt.Println("Shared Key client:", myKeys.sharedKeyClient)
 	redis_key := fmt.Sprintf("%s:%s", response.GetNonce(), response.GetServerNonce())
 
 	return myKeys.sharedKeyClient, redis_key, messageidd, nil
@@ -176,22 +177,6 @@ func authenticateIP(c *gin.Context) {
 	}
 }
 
-// func gatewayHandler(c *gin.Context) {
-
-// 	request := &grpcService_get_users.GetDataRequest{
-// 		UserId:  10,
-// 		AuthKey: AuthKey_get,
-// 	}
-
-// 	ctx := c.Request.Context()
-// 	response, err := client.GetData(ctx, request)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-// 		return
-// 	}
-
-// 	c.JSON(http.StatusOK, gin.H{"data": response.ReturnUsers})
-// }
 func cleanupBlacklist() {
 	for {
 		time.Sleep(time.Minute)
@@ -216,7 +201,7 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 	client := grpcService_get_users.NewGetUsersClient(conn)
 	// client :=grpcService_get_users.GetUsersClient
 	request := &grpcService_get_users.GetDataRequest{
-		UserId:    10000000,
+		UserId:    1,
 		AuthKey:   AuthKey_get.Bytes(),
 		MessageId: message,
 		RedisKey:  redis_key,
@@ -254,7 +239,9 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 func BizServiceWithSqlInject(redis_key string, message int32) {
 
 }
-func login(c *gin.Context) {
+func gatewayHandler(c *gin.Context) {
+
+	log.Printf("ssssssssssssss")
 	x, redis_key, message, y := getAuthKey()
 	AuthKey_get = x
 	err := y
@@ -271,8 +258,8 @@ func login(c *gin.Context) {
 func main() {
 	router := gin.Default()
 	go cleanupBlacklist()
-	router.Use(authenticateIP)
+	// router.Use(authenticateIP)
 
-	router.GET("/gateway", login)
+	router.GET("/gateway", gatewayHandler)
 	router.Run(":8080")
 }

@@ -68,12 +68,14 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 	if err != nil {
 		return nil, err1
 	}
-
+	fmt.Println("gg: ", response.G, "--------------------------")
+	fmt.Println("pp: ", response.P, "--------------------------")
 	//calculate g^b mod p
 	personal_key_b := int64(random1.Intn(10000))
-	g := big.NewInt(response.G)
+	// g := big.NewInt(response.G)
+	g := int32(response.G)
 	b := big.NewInt(personal_key_b)
-	p := big.NewInt(response.P)
+	p := int32(response.P)
 	// g^b mod p:
 	public_key_B := new(big.Int).Exp(g, b, p)
 
@@ -119,8 +121,10 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 		publicKeyServer:   public_key_B,
 		sharedKeyServer:   shared_key,
 	}
-	fmt.Println("personal Key for server:", myKeys.personalKeyServer)
-	fmt.Println("Public Key for server:", myKeys.publicKeyServer)
+	fmt.Print("g:", g, " p:", p, " +++++++++++++++++++++")
+
+	// fmt.Println("personal Key for server:", myKeys.personalKeyServer)
+	// fmt.Println("Public Key for server:", myKeys.publicKeyServer)
 	fmt.Println("Shared Key:", myKeys.sharedKeyServer)
 	return resp, nil
 }

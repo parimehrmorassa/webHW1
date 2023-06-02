@@ -112,10 +112,21 @@ func DatabaseConnection() {
 }
 
 func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetDataResponse, error) {
-
+	fmt.Println(req.RedisKey, "==================================")
 	var user User
 	//read redis to get auth key to check validation of the recevied auth key
-	value, err := s.redisClient.Get(c, req.RedisKey).Result()
+	redisClient := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379", //redis port its true
+		Password: "",               //dafault pass
+		DB:       0,                //default db
+	})
+
+	_, err := redisClient.Ping(context.Background()).Result()
+	if err != nil {
+		log.Fatalf("Failed to connect to Redissss: %v", err)
+	}
+
+	value, err := redisClient.Get(c, req.RedisKey).Result()
 	if err != nil {
 		log.Printf("Failed to retrieve data from Redis for get authkey: %v", err)
 	}
@@ -126,12 +137,14 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 	if err != nil {
 		return nil, err1
 	}
-
-	authKey := big.NewInt(req.AuthKey)
+	authKey := new(big.Int)
+	authKey.SetBytes(req.AuthKey)
+	fmt.Println(response, "   ", authKey)
+	// authKey := big.NewInt(req.AuthKey)
 	if authKey.Cmp(response) != 0 {
 		return nil, fmt.Errorf("invalid auth_key")
 	} else {
-
+		fmt.Println("****************************************************")
 		log.Printf("authentication: valid auth")
 		fmt.Println("authentication: valid auth")
 		res := DB.Find(&user, "id = ?", req.UserId)
