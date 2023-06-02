@@ -1,27 +1,27 @@
 package main
 
 import (
+	"context"
 	"crypto/rand"
 	"encoding/base64"
+	"fmt"
 	"log"
-	"net/http"
+	"math/big"
+	random1 "math/rand"
 	"sync"
 	"time"
 
-	"context"
-	"fmt"
-	"math/big"
-	random1 "math/rand"
-
-	"reflect"
-
-	"github.com/gin-gonic/gin"
-	get_user_injection "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
-	"google.golang.org/grpc"
+	"net/http"
 
 	DH_params "github.com/royadaneshi/webHW1/auth/DH_params"
 	Auth_service "github.com/royadaneshi/webHW1/auth/authservice"
 	grpcService_get_users "github.com/royadaneshi/webHW1/service1/get_user/pb"
+	get_user_injection "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
+	"google.golang.org/grpc"
+
+	"reflect"
+
+	"github.com/gin-gonic/gin"
 )
 
 const (
@@ -327,6 +327,8 @@ func main() {
 	router := gin.Default()
 	go cleanupBlacklist()
 	// router.Use(authenticateIP)
+
+	//////////////////////
 	fmt.Println("-----============")
 	router.GET("/gateway/get_users", gatewayHandler)
 	fmt.Println("/////////////////////////////")
