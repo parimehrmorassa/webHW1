@@ -2,8 +2,8 @@ syntax = "proto3";
 
 option go_package = "get_users_with_sql_inject_proto/pb";
 
-service get_users {
-  rpc GetData(GetDataRequest) returns (GetDataResponse) {}
+service get_users_inject {
+  rpc GetData(GetDataRequestInject) returns (GetDataResponseInject) {}
 }
 
 message User {
@@ -15,7 +15,7 @@ message User {
   string createdAt = 6;
 }
 
-message GetDataRequest {
+message GetDataRequestInject {
   string  user_id    = 1;
   bytes auth_key   = 2;
   int32  message_id = 3;
@@ -23,7 +23,7 @@ message GetDataRequest {
 }
 
 
-message GetDataResponse {
+message GetDataResponseInject {
   repeated User return_users = 1;
   int32 message_id = 2;
 }

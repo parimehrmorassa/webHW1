@@ -18,12 +18,11 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := pb.NewGetUsersClient(conn)
-	request := &pb.GetDataRequest{
+	client := pb.NewGetUsersInjectClient(conn)
+	request := &pb.GetDataRequestInject{
 		UserId: "1000000",
 	}
 
-	
 	response, err := client.GetData(context.Background(), request)
 	if err != nil {
 		log.Fatalf("Failed to get data: %v", err)

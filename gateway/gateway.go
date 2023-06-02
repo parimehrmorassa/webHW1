@@ -19,8 +19,6 @@ import (
 	get_user_injection "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
 	"google.golang.org/grpc"
 
-	"reflect"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -251,10 +249,9 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context) {
 	}
 	defer conn.Close()
 	fmt.Println("+++++++++++++++++++++++++++++")
-	fmt.Println(reflect.TypeOf(AuthKey_get), "------------")
 
-	client := get_user_injection.NewGetUsersClient(conn)
-	request := &get_user_injection.GetDataRequest{
+	client := get_user_injection.NewGetUsersInjectClient(conn)
+	request := &get_user_injection.GetDataRequestInject{
 		UserId:    "1",
 		AuthKey:   AuthKey_get.Bytes(),
 		MessageId: message,
