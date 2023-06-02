@@ -15,7 +15,9 @@ import (
 
 	DH_params "github.com/royadaneshi/webHW1/auth/DH_params"
 	Auth_service "github.com/royadaneshi/webHW1/auth/authservice"
+
 	grpcService_get_users "github.com/royadaneshi/webHW1/service1/get_user/pb"
+
 	get_user_injection "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
 	"google.golang.org/grpc"
 
@@ -211,7 +213,7 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 		MessageId: message,
 		RedisKey:  redis_key,
 	}
-	response, err := client.GetDataInject(c.Request.Context(), request)
+	response, err := client.GetData(c.Request.Context(), request)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		log.Fatalf("Failed to get data from Biz service : %v", err)

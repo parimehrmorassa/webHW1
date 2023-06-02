@@ -6,7 +6,7 @@ service get_users_inject {
   rpc GetData(GetDataRequestInject) returns (GetDataResponseInject) {}
 }
 
-message User {
+message UserInject {
   string  id        = 1;
   string name      = 2;
   string family    = 3;
@@ -24,6 +24,6 @@ message GetDataRequestInject {
 
 
 message GetDataResponseInject {
-  repeated User return_users = 1;
+  repeated UserInject return_users = 1;
   int32 message_id = 2;
 }
