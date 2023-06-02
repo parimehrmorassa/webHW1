@@ -95,8 +95,8 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 		Nonce:       req.GetNonce(),
 		ServerNonce: generateNonce(),
 		MessageId:   generateOddNumber(),
-		P:           p.int32(),
-		G:           g.int32(),
+		P:           p.String(),
+		G:           g.String(),
 	}
 
 	// save to redis

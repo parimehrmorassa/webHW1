@@ -73,9 +73,13 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 	//calculate g^b mod p
 	personal_key_b := int64(random1.Intn(10000))
 	// g := big.NewInt(response.G)
-	g := int32(response.G)
+	g := new(big.Int)
+	g.SetString(response.G, 10)
+	p := new(big.Int)
+	p.SetString(response.P, 10)
+	// g := int32(response.G)
 	b := big.NewInt(personal_key_b)
-	p := int32(response.P)
+	// p := int32(response.P)
 	// g^b mod p:
 	public_key_B := new(big.Int).Exp(g, b, p)
 
