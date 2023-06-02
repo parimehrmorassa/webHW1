@@ -19,10 +19,12 @@ message GetDataRequest {
   int32  user_id    = 1;
   string auth_key   = 2;
   int32  message_id = 3;
+  string redis_key  = 4;
 }
 
 
 message GetDataResponse {
   repeated User return_users = 1;
-  int32 message_id = 2;
+  int32    message_id        = 2;
+
 }
