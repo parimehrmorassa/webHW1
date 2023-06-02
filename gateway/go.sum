@@ -50,6 +50,8 @@ github.com/royadaneshi/webHW1/auth v0.0.0-20230602082821-69817d5f2188 h1:xrSLPRZ
 github.com/royadaneshi/webHW1/auth v0.0.0-20230602082821-69817d5f2188/go.mod h1:ljelW9x+27FOM3G6o6PhiKxVnLK/q+dGTKWzIQyXrpg=
 github.com/royadaneshi/webHW1/auth v0.0.0-20230602084123-b4fe4472bd51 h1:zaGXBJvAXG7Q1/WOemOMvRJNXqJXBpLHgAvhL3YnEa4=
 github.com/royadaneshi/webHW1/auth v0.0.0-20230602084123-b4fe4472bd51/go.mod h1:ljelW9x+27FOM3G6o6PhiKxVnLK/q+dGTKWzIQyXrpg=
+github.com/royadaneshi/webHW1/auth v0.0.0-20230602123352-02113169e278 h1:ndO2XTsQPSPOZ1Bk6PGpt6e4gb07AXzdirl01Cxc+Ms=
+github.com/royadaneshi/webHW1/auth v0.0.0-20230602123352-02113169e278/go.mod h1:ljelW9x+27FOM3G6o6PhiKxVnLK/q+dGTKWzIQyXrpg=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230526185532-1d87ee8b238f h1:e5VNYlA6tZ/box7cZ0beHc1Xxu3SUWbSWn2TUOhplRI=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230526185532-1d87ee8b238f/go.mod h1:0lJpoiCXv6ZmzGmxkZD57Q2sWcd3VR+k0NLhfjYqw/I=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230602084123-b4fe4472bd51 h1:3+u8Df1iyB7iEXipWIHrNWxDIG/AuPa/RdjD6RyhXt8=

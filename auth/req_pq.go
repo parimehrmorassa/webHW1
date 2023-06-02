@@ -65,19 +65,6 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 	// if err != nil {
 	// 	return nil, fmt.Errorf("Error:", err)
 	// }
-	// privateKey, err := dh.GenerateParameters(rand.Reader, 2048)
-
-	// privateKey, err := dh.GenerateKey(rand.Reader, 2048)
-
-	// privateKey := new(dsa.PrivateKey)
-	// privateKey.Parameters.Generate(rand.Reader, 2048)
-	// parameters := privateKey.Parameters
-
-	// // if err != nil {
-	// // 	return nil, fmt.Errorf("Error generating private key:", err)
-	// // }
-	// g := parameters.G
-	// p := parameters.P
 
 	params := new(dsa.Parameters)
 	err := dsa.GenerateParameters(params, rand.Reader, dsa.L2048N256)
@@ -88,8 +75,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 
 	g := params.G
 	p := params.P
-	fmt.Println("P:", p)
-	fmt.Println("G:", g)
+
 	/////////////////////
 	resp := &pb.MyResponse{
 		Nonce:       req.GetNonce(),
@@ -111,7 +97,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 	if err != nil {
 		log.Printf("Failed to store data in Redis: %v", err)
 	}
-	fmt.Println(" key: ", key)
+	fmt.Println(" SHA1: ", key)
 
 	///
 	// data, err := s.redisClient.Get(ctx, key).Result()

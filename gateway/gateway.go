@@ -115,10 +115,16 @@ func getAuthKey() (*big.Int, string, int32, error) {
 	defer conn1.Close()
 
 	personal_key := int64(random1.Intn(10000))
-	g := big.NewInt(response.GetG())
+	// g := big.NewInt(response.GetG())
 	a := big.NewInt(personal_key)
-	p := big.NewInt(response.GetP())
-	fmt.Print("g:", g, " p:", p, " +++++++++++++++++++++")
+	// p := big.NewInt(response.GetP())
+	g := new(big.Int)
+	g.SetString(response.GetG(), 10)
+
+	p := new(big.Int)
+	p.SetString(response.GetP(), 10)
+
+	// fmt.Print("g:", g, " p:", p, " +++++++++++++++++++++")
 	//g^a mod p:
 	public_key := new(big.Int).Exp(g, a, p)
 	client1 := DH_params.NewDHParamsServiceClient(conn1)
@@ -146,7 +152,7 @@ func getAuthKey() (*big.Int, string, int32, error) {
 		sharedKeyClient:   shared_key,
 	}
 
-	fmt.Println("Shared Key client:", myKeys.sharedKeyClient)
+	// fmt.Println("Shared Key client:", myKeys.sharedKeyClient)
 	redis_key := fmt.Sprintf("%s:%s", response.GetNonce(), response.GetServerNonce())
 
 	return myKeys.sharedKeyClient, redis_key, messageidd, nil
@@ -213,27 +219,27 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"data": response.ReturnUsers})
 
-	// if response.MessageId == 1 {
-	// 	user := response.ReturnUsers[0]
-	// 	fmt.Println("User ID: %d\n", user.Id)
-	// 	fmt.Printf("Name: %s\n", user.Name)
-	// 	fmt.Printf("Family: %s\n", user.Family)
-	// 	fmt.Printf("Age: %d\n", user.Age)
-	// 	fmt.Printf("Sex: %s\n", user.Sex)
-	// 	fmt.Printf("Created At: %s\n", user.CreatedAt)
-	// } else if response.MessageId == 3 {
-	// 	for _, user := range response.ReturnUsers {
-	// 		fmt.Printf("User ID: %d\n", user.Id)
-	// 		fmt.Printf("Name: %s\n", user.Name)
-	// 		fmt.Printf("Family: %s\n", user.Family)
-	// 		fmt.Printf("Age: %d\n", user.Age)
-	// 		fmt.Printf("Sex: %s\n", user.Sex)
-	// 		fmt.Printf("Created At: %s\n", user.CreatedAt)
-	// 		fmt.Println("------")
-	// 	}
-	// } else {
-	// 	fmt.Println("Unknown response from server")
-	// }
+	if response.MessageId == 1 {
+		user := response.ReturnUsers[0]
+		fmt.Println("User ID: %d\n", user.Id)
+		fmt.Printf("Name: %s\n", user.Name)
+		fmt.Printf("Family: %s\n", user.Family)
+		fmt.Printf("Age: %d\n", user.Age)
+		fmt.Printf("Sex: %s\n", user.Sex)
+		fmt.Printf("Created At: %s\n", user.CreatedAt)
+	} else if response.MessageId == 3 {
+		for _, user := range response.ReturnUsers {
+			fmt.Printf("User ID: %d\n", user.Id)
+			fmt.Printf("Name: %s\n", user.Name)
+			fmt.Printf("Family: %s\n", user.Family)
+			fmt.Printf("Age: %d\n", user.Age)
+			fmt.Printf("Sex: %s\n", user.Sex)
+			fmt.Printf("Created At: %s\n", user.CreatedAt)
+			fmt.Println("------")
+		}
+	} else {
+		fmt.Println("Unknown response from server")
+	}
 
 }
 func BizServiceWithSqlInject(redis_key string, message int32) {
@@ -241,7 +247,6 @@ func BizServiceWithSqlInject(redis_key string, message int32) {
 }
 func gatewayHandler(c *gin.Context) {
 
-	log.Printf("ssssssssssssss")
 	x, redis_key, message, y := getAuthKey()
 	AuthKey_get = x
 	err := y
