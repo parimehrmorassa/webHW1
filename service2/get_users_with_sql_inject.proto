@@ -3,7 +3,7 @@ syntax = "proto3";
 option go_package = "get_users_with_sql_inject_proto/pb";
 
 service get_users_inject {
-  rpc GetDataInject(GetDataRequestInject) returns (GetDataResponseInject) {}
+  rpc GetData(GetDataRequestInject) returns (GetDataResponseInject) {}
 }
 
 message User {
