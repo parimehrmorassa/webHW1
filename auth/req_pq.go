@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
@@ -75,12 +76,27 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 	}
 
 	// save to redis
+	jsonValue, err := json.Marshal(resp)
+	if err != nil {
+		return nil, err
+	}
+
 	key := fmt.Sprintf("%s:%s", resp.Nonce, resp.ServerNonce)
-	err = s.redisClient.Set(ctx, key, "", 20*time.Minute).Err()
+
+	err = s.redisClient.Set(ctx, key, jsonValue, 20*time.Minute).Err()
 	if err != nil {
 		log.Printf("Failed to store data in Redis: %v", err)
 	}
+	fmt.Println(" key: ", key)
 
+	///
+	// data, err := s.redisClient.Get(ctx, key).Result()
+	// if err != nil {
+	// 	log.Printf("Failed to retrieve data from Redis: %v", err)
+	// }
+
+	// fmt.Println("Retrieved data:", data)
+	// /////
 	return resp, nil
 }
 
