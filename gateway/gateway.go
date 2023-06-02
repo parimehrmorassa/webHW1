@@ -217,7 +217,7 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 	// client :=grpcService_get_users.GetUsersClient
 	request := &grpcService_get_users.GetDataRequest{
 		UserId:    10000000,
-		AuthKey:   AuthKey_get,
+		AuthKey:   AuthKey_get.Bytes(),
 		MessageId: message,
 		RedisKey:  redis_key,
 	}
