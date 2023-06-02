@@ -17,10 +17,13 @@ func main() {
 		log.Fatalf("Failed to connect: %v", err)
 	}
 	defer conn.Close()
+
 	client := pb.NewGetUsersClient(conn)
 	request := &pb.GetDataRequest{
 		UserId: "1000000",
 	}
+
+	
 	response, err := client.GetData(context.Background(), request)
 	if err != nil {
 		log.Fatalf("Failed to get data: %v", err)

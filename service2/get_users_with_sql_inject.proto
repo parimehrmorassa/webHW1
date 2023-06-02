@@ -17,8 +17,9 @@ message User {
 
 message GetDataRequest {
   string  user_id    = 1;
-  string auth_key   = 2;
+  bytes auth_key   = 2;
   int32  message_id = 3;
+  string redis_key  = 4;
 }
 
 

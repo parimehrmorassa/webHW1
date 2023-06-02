@@ -14,6 +14,7 @@ import (
 	random1 "math/rand"
 
 	"github.com/gin-gonic/gin"
+	get_user_injection "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
 	"google.golang.org/grpc"
 
 	DH_params "github.com/royadaneshi/webHW1/auth/DH_params"
@@ -241,7 +242,53 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 	}
 
 }
-func BizServiceWithSqlInject(redis_key string, message int32) {
+func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context) {
+	grpcAddress := "localhost:50053"
+	conn, err := grpc.Dial(grpcAddress, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("Failed to connect to gRPC server: %v", err)
+	}
+	defer conn.Close()
+
+	client := get_user_injection.NewGetUsersClient(conn)
+
+	request := &get_user_injection.GetDataRequest{
+		UserId:    1,
+		AuthKey:   AuthKey_get.Bytes(),
+		MessageId: message,
+		RedisKey:  redis_key,
+	}
+
+	response, err := client.GetData(c.Request.Context(), request)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		log.Fatalf("Failed to get data from Biz service : %v", err)
+	}
+	c.JSON(http.StatusOK, gin.H{"data": response.ReturnUsers})
+
+	if response.MessageId == 1 {
+		user := response.ReturnUsers[0]
+		fmt.Println("User ID: %d\n", user.Id)
+		fmt.Printf("Name: %s\n", user.Name)
+		fmt.Printf("Family: %s\n", user.Family)
+		fmt.Printf("Age: %d\n", user.Age)
+		fmt.Printf("Sex: %s\n", user.Sex)
+		fmt.Printf("Created At: %s\n", user.CreatedAt)
+	} else if response.MessageId == 3 {
+		for _, user := range response.ReturnUsers {
+			fmt.Printf("User ID: %d\n", user.Id)
+			fmt.Printf("Name: %s\n", user.Name)
+			fmt.Printf("Family: %s\n", user.Family)
+			fmt.Printf("Age: %d\n", user.Age)
+			fmt.Printf("Sex: %s\n", user.Sex)
+			fmt.Printf("Created At: %s\n", user.CreatedAt)
+			fmt.Println("------")
+		}
+	} else {
+		fmt.Println("Unknown response from server")
+	}
+
+	////////////////////////////////////////////////////////////
 
 }
 func gatewayHandler(c *gin.Context) {
@@ -256,7 +303,21 @@ func gatewayHandler(c *gin.Context) {
 	// Connect to the get_users service
 	BizService(redis_key, message, c)
 	//////////////////////////
-	BizServiceWithSqlInject(redis_key, message)
+
+}
+
+func gatewayHandlerSqlInject(c *gin.Context) {
+
+	x, redis_key, message, y := getAuthKey()
+	AuthKey_get = x
+	err := y
+	if err != nil {
+		log.Fatalf("Failed to get the auth key: %v", err)
+	}
+
+	// Connect to the get_users_with_sql_inject service
+
+	BizServiceWithSqlInject(redis_key, message, c)
 	//////////////////////////
 }
 func main() {
@@ -264,6 +325,7 @@ func main() {
 	go cleanupBlacklist()
 	// router.Use(authenticateIP)
 
-	router.GET("/gateway", gatewayHandler)
+	router.GET("/gateway/get_users", gatewayHandler)
+	router.GET("/gateway/get_users_with_sql_inject", gatewayHandlerSqlInject)
 	router.Run(":8080")
 }
