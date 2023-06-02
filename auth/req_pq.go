@@ -8,7 +8,7 @@ import (
 	"math/big"
 	"net"
 	"time"
-
+	mrand "math/rand"
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc"
 
@@ -38,6 +38,14 @@ func generateRandomPrime(bits int) (*big.Int, error) {
 	}
 	return p, nil
 }
+func generateOddNumber() int32 {
+	for {
+		num := mrand.Int31n(1000) + 1
+		if num%2 != 0 {
+			return num
+		}
+	}
+}
 func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyResponse, error) {
 	if req.MessageId%2 != 0 || req.MessageId <= 0 {
 		return nil, fmt.Errorf("Invalid message ID")
@@ -60,7 +68,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 	resp := &pb.MyResponse{
 		Nonce:       req.GetNonce(),
 		ServerNonce: generateNonce(),
-		MessageId:   req.GetMessageId(),
+		MessageId:   generateOddNumber(),
 		P:           p.Int64(),
 		G:           int32(g.Int64()),
 	}

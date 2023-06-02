@@ -68,4 +68,5 @@ func main() {
 
 	fmt.Printf("Response:\nNonce: %s\nServer Nonce: %s\nMessage ID: %d\nP: %d\nG: %d\n",
 		response.GetNonce(), response.GetServerNonce(), response.GetMessageId(), response.GetP(), response.GetG())
+
 }
