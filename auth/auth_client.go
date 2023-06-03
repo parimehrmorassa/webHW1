@@ -133,7 +133,7 @@ func main() {
 	b_server_key := new(big.Int)
 	b_server_key.SetString(response1.B, 10)
 	// B^a mod p:
-	shared_key := new(big.Int).Exp(public_key, b_server_key, p)
+	shared_key := new(big.Int).Exp(b_server_key, a, p)
 
 	////
 	myKeys := keys{

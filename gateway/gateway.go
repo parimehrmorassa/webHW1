@@ -151,12 +151,10 @@ func getAuthKey() (*big.Int, string, int32, error) {
 		log.Fatalf("Failed to call ProcessRequest auth2: %v", err2)
 	}
 	//calculate Shared key
-	// b_server_key := big.NewInt(response1.B)
-
 	b_server_key := new(big.Int)
 	b_server_key.SetString(response1.B, 10)
 	// B^a mod p:
-	shared_key := new(big.Int).Exp(public_key, b_server_key, p)
+	shared_key := new(big.Int).Exp(b_server_key, a, p)
 
 	////
 	myKeys := keys{
@@ -165,7 +163,7 @@ func getAuthKey() (*big.Int, string, int32, error) {
 		sharedKeyClient:   shared_key,
 	}
 
-	fmt.Println("Shared Key client:", myKeys.sharedKeyClient, " p:", p, "  g:", g, " public_key sent to server:", public_key, "  public received:", b_server_key)
+	// fmt.Println("Shared Key client:", myKeys.sharedKeyClient, " p:", p, "  g:", g, " public_key sent to server:", public_key, "  public received:", b_server_key)
 	redis_key := fmt.Sprintf("%s:%s", response.GetNonce(), response.GetServerNonce())
 
 	return myKeys.sharedKeyClient, redis_key, messageidd, nil

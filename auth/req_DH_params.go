@@ -103,7 +103,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 	a_client_key.SetString(req.A, 10)
 
 	// B^a mod p:
-	shared_key := new(big.Int).Exp(public_key_B, a_client_key, p)
+	shared_key := new(big.Int).Exp(a_client_key, b, p)
 
 	// Remove the last data of the user from Redis
 	err = s.redisClient.Del(ctx, key1).Err()
@@ -136,8 +136,8 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 
 	// fmt.Println("personal Key for server:", myKeys.personalKeyServer)
 	// fmt.Println("Public Key for server:", myKeys.publicKeyServer)
-	// fmt.Println("Shared Key:", myKeys.sharedKeyServer)
-	fmt.Println("Shared Key client:", myKeys.sharedKeyServer, " p:", p, "  g:", g, " public_key sent to client:", public_key_B, " public key received:", a_client_key)
+	fmt.Println("Shared Key:", myKeys.sharedKeyServer)
+	// fmt.Println("Shared Key client:", myKeys.sharedKeyServer, " p:", p, "  g:", g, " public_key sent to client:", public_key_B, " public key received:", a_client_key)
 
 	return resp, nil
 }
