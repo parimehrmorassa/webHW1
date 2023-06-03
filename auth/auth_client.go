@@ -107,9 +107,13 @@ func main() {
 
 	personal_key := privateKey.D
 
-	g := big.NewInt(response.GetG())
+	g := new(big.Int)
+	g.SetString(response.GetG(), 10)
+
+	p := new(big.Int)
+	p.SetString(response.GetP(), 10)
+
 	a := big.NewInt(personal_key.Int64())
-	p := big.NewInt(response.GetP())
 	//g^a mod p:
 	public_key := new(big.Int).Exp(g, a, p)
 	client1 := pb1.NewDHParamsServiceClient(conn1)
@@ -118,7 +122,7 @@ func main() {
 		ServerNonce: response.GetServerNonce(),
 		MessageId:   generateEvenNumberGreaterThan(messageID),
 
-		A: public_key.Int64(),
+		A: public_key.String(),
 	}
 	response1, err2 := client1.ProcessRequest(context.Background(), request1)
 	if err2 != nil {
