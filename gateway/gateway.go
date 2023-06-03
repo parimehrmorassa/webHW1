@@ -14,6 +14,8 @@ import (
 
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	DH_params "github.com/royadaneshi/webHW1/auth/DH_params"
 	Auth_service "github.com/royadaneshi/webHW1/auth/authservice"
 
@@ -21,20 +23,24 @@ import (
 
 	get_user_injection "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
 	"google.golang.org/grpc"
-
-	"github.com/gin-gonic/gin"
 )
 
+type IPData struct {
+	Count       int
+	LastRequest time.Time
+}
+
 const (
-	MaxRequestsPerSecond = 100
-	BanDuration          = 24 * time.Hour
+	MaxRequestsPerSecond = 2                //100
+	BanDuration          = 10 * time.Second //24 * time.Hour
 )
 
 var (
+	AuthKey_get *big.Int
 	blacklist   = make(map[string]time.Time)
 	blacklistMu sync.Mutex
-	client      grpcService_get_users.GetUsersClient
-	AuthKey_get *big.Int
+	ipData      = make(map[string]*IPData)
+	ipDataMu    sync.Mutex
 )
 
 func generateNonce(length int) (string, error) {
@@ -169,45 +175,6 @@ func getAuthKey() (*big.Int, string, int32, error) {
 	return myKeys.sharedKeyClient, redis_key, messageidd, nil
 }
 
-func authenticateIP(c *gin.Context) {
-	ip := c.ClientIP()
-	blacklistMu.Lock()
-	if banTime, ok := blacklist[ip]; ok && banTime.After(time.Now()) {
-		c.AbortWithStatus(http.StatusForbidden)
-		blacklistMu.Unlock()
-		return
-	}
-	blacklistMu.Unlock()
-
-	// rate limiting by tick
-	limiter := time.Tick(time.Second / MaxRequestsPerSecond)
-	select {
-	case <-limiter:
-		// its okk
-		c.Next()
-	default:
-		// add IP to the blacklist there was many requests
-		blacklistMu.Lock()
-		blacklist[ip] = time.Now().Add(BanDuration)
-		blacklistMu.Unlock()
-		c.AbortWithStatus(http.StatusTooManyRequests)
-	}
-}
-
-func cleanupBlacklist() {
-	for {
-		time.Sleep(time.Minute)
-		currentTime := time.Now()
-
-		blacklistMu.Lock()
-		for ip, banTime := range blacklist {
-			if banTime.Before(currentTime) {
-				delete(blacklist, ip)
-			}
-		}
-		blacklistMu.Unlock()
-	}
-}
 func BizService(redis_key string, message int32, c *gin.Context, userID int32) {
 	// fmt.Println(userID, "iddddddddddd")
 	grpcAddress := "localhost:50051"
@@ -337,10 +304,71 @@ func gatewayHandlerSqlInject(c *gin.Context) {
 	BizServiceWithSqlInject(redis_key, message, c, userID)
 	//////////////////////////
 }
+func authenticateIP(c *gin.Context) {
+	ip := c.ClientIP()
+
+	ipDataMu.Lock()
+	if _, ok := ipData[ip]; !ok {
+		ipData[ip] = &IPData{
+			Count:       0,
+			LastRequest: time.Now(),
+		}
+	}
+	ipDataMu.Unlock()
+
+	ipDataMu.Lock()
+	data := ipData[ip]
+	data.Count++
+	if data.Count > MaxRequestsPerSecond {
+		blacklistMu.Lock()
+		blacklist[ip] = time.Now().Add(BanDuration)
+		blacklistMu.Unlock()
+		c.AbortWithStatus(http.StatusTooManyRequests)
+		return
+	}
+	data.LastRequest = time.Now()
+	ipDataMu.Unlock()
+
+	c.Next()
+}
+func resetRequestCount() {
+	for {
+		time.Sleep(1 * time.Second)
+		fmt.Println("**********")
+
+		ipDataMu.Lock()
+		for _, data := range ipData {
+			if time.Since(data.LastRequest) >= time.Second {
+				data.Count = 0
+			}
+		}
+		ipDataMu.Unlock()
+	}
+}
+
+func cleanupBlacklist() {
+	for {
+		time.Sleep(5 * time.Second)
+		fmt.Println("*----------------------")
+
+		currentTime := time.Now()
+
+		blacklistMu.Lock()
+		for ip, banTime := range blacklist {
+			if banTime.Before(currentTime) {
+				delete(blacklist, ip)
+			}
+		}
+		blacklistMu.Unlock()
+	}
+}
+
 func main() {
 	router := gin.Default()
+	go resetRequestCount()
+
 	go cleanupBlacklist()
-	// router.Use(authenticateIP)
+	router.Use(authenticateIP)
 
 	router.GET("/gateway/get_users/:user_id", gatewayHandler)
 
