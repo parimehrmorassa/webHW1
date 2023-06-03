@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"crypto/rsa"
 	"encoding/base64"
 	"fmt"
 	"log"
 	"math/big"
-	random1 "math/rand"
 
 	pb1 "github.com/royadaneshi/webHW1/auth/DH_params"
 	pb "github.com/royadaneshi/webHW1/auth/authservice"
@@ -97,9 +97,18 @@ func main() {
 	}
 	defer conn1.Close()
 
-	personal_key := int64(random1.Intn(10000))
+	// personal_key := int64(random1.Intn(10000))
+
+	// Generate a new private key for the client side
+	privateKey, err := rsa.GenerateKey(rand.Reader, 20)
+	if err != nil {
+		log.Fatal("Failed to generate private key b:", err)
+	}
+
+	personal_key := privateKey.D
+
 	g := big.NewInt(response.GetG())
-	a := big.NewInt(personal_key)
+	a := big.NewInt(personal_key.Int64())
 	p := big.NewInt(response.GetP())
 	//g^a mod p:
 	public_key := new(big.Int).Exp(g, a, p)

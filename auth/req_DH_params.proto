@@ -6,14 +6,14 @@ message DHParamsRequest {
   string nonce        = 1;
   string server_nonce = 2;
   int32  message_id   = 3;
-  int64  a            = 4;
+  string  a            = 4;
 }
 
 message DHParamsResponse {
   string nonce        = 1;
   string server_nonce = 2;
   int32  message_id   = 3;
-  int64  b            = 4;
+  string  b            = 4;
 
 }
 

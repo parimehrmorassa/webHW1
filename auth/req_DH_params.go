@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"log"
 	"math/big"
-	random1 "math/rand"
 	"net"
+
+	"crypto/rsa"
 
 	"github.com/go-redis/redis/v8"
 	"google.golang.org/grpc"
@@ -70,15 +71,21 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 	}
 
 	//calculate g^b mod p
-	personal_key_b := int64(random1.Intn(10000))
+	// personal_key_b := int64(random1.Intn(10000))
+	// Generate a new private key for the server side
+	privateKey, err := rsa.GenerateKey(rand.Reader, 20)
+	if err != nil {
+		log.Fatal("Failed to generate private key b:", err)
+	}
 
+	personal_key_b := privateKey.D
 	g := new(big.Int)
 	g.SetString(response.G, 10)
 
 	p := new(big.Int)
 	p.SetString(response.P, 10)
 
-	b := big.NewInt(personal_key_b)
+	b := big.NewInt(personal_key_b.Int64())
 
 	// g^b mod p:
 	public_key_B := new(big.Int).Exp(g, b, p)
@@ -127,7 +134,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 	// fmt.Println("personal Key for server:", myKeys.personalKeyServer)
 	// fmt.Println("Public Key for server:", myKeys.publicKeyServer)
 	// fmt.Println("Shared Key:", myKeys.sharedKeyServer)
-	fmt.Println("Shared Key client:", myKeys.sharedKeyServer, " p:", p, "  g:", g, " a:", b, " b:", a_client_key)
+	fmt.Println("Shared Key client:", myKeys.sharedKeyServer, " p:", p, "  g:", g, " public_key sent to client:", public_key_B, " public key received:", a_client_key)
 
 	return resp, nil
 }
