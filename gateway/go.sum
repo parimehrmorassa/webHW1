@@ -48,6 +48,8 @@ github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZb
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/royadaneshi/webHW1/auth v0.0.0-20230602123352-02113169e278 h1:ndO2XTsQPSPOZ1Bk6PGpt6e4gb07AXzdirl01Cxc+Ms=
 github.com/royadaneshi/webHW1/auth v0.0.0-20230602123352-02113169e278/go.mod h1:ljelW9x+27FOM3G6o6PhiKxVnLK/q+dGTKWzIQyXrpg=
+github.com/royadaneshi/webHW1/auth v0.0.0-20230603142326-1e5d8ec60641 h1:/m4s4jR3VNVmEQeALLSHYvEYdrTCfHlwdcK4QX1xRwI=
+github.com/royadaneshi/webHW1/auth v0.0.0-20230603142326-1e5d8ec60641/go.mod h1:ljelW9x+27FOM3G6o6PhiKxVnLK/q+dGTKWzIQyXrpg=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230602084123-b4fe4472bd51 h1:3+u8Df1iyB7iEXipWIHrNWxDIG/AuPa/RdjD6RyhXt8=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230602084123-b4fe4472bd51/go.mod h1:B6iX5doE8L3NclFqzDtofJ4jKbt1SSkw5q/e/GgpqqM=
 github.com/royadaneshi/webHW1/service1 v0.0.0-20230602135549-0d23df8edbbe h1:WVfqK4RDiVoRVv/fj2UYoHbWtuuIbCX0hzRKtzFBhKs=

@@ -125,7 +125,9 @@ func main() {
 		log.Fatalf("Failed to call ProcessRequest auth2: %v", err2)
 	}
 	//calculate Shared key
-	b_server_key := big.NewInt(response1.B)
+	// b_server_key := big.NewInt(response1.B)
+	b_server_key := new(big.Int)
+	b_server_key.SetString(response1.B, 10)
 	// B^a mod p:
 	shared_key := new(big.Int).Exp(public_key, b_server_key, p)
 

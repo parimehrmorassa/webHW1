@@ -3,11 +3,11 @@ package main
 import (
 	"context"
 	"crypto/rand"
+	"crypto/rsa"
 	"encoding/base64"
 	"fmt"
 	"log"
 	"math/big"
-	random1 "math/rand"
 	"strconv"
 	"sync"
 	"time"
@@ -117,9 +117,17 @@ func getAuthKey() (*big.Int, string, int32, error) {
 	}
 	defer conn1.Close()
 
-	personal_key := int64(random1.Intn(10000))
+	// personal_key := int64(random1.Intn(10000))
 
-	a := big.NewInt(personal_key)
+	// Generate a new private key for the client side
+	privateKey, err := rsa.GenerateKey(rand.Reader, 20)
+	if err != nil {
+		log.Fatal("Failed to generate private key b:", err)
+	}
+
+	personal_key := privateKey.D
+
+	a := big.NewInt(personal_key.Int64())
 
 	g := new(big.Int)
 	g.SetString(response.GetG(), 10)
@@ -136,14 +144,17 @@ func getAuthKey() (*big.Int, string, int32, error) {
 		ServerNonce: response.GetServerNonce(),
 		MessageId:   messageidd,
 
-		A: public_key.Int64(),
+		A: public_key.String(),
 	}
 	response1, err2 := client1.ProcessRequest(context.Background(), request1)
 	if err2 != nil {
 		log.Fatalf("Failed to call ProcessRequest auth2: %v", err2)
 	}
 	//calculate Shared key
-	b_server_key := big.NewInt(response1.B)
+	// b_server_key := big.NewInt(response1.B)
+
+	b_server_key := new(big.Int)
+	b_server_key.SetString(response1.B, 10)
 	// B^a mod p:
 	shared_key := new(big.Int).Exp(public_key, b_server_key, p)
 
@@ -154,7 +165,7 @@ func getAuthKey() (*big.Int, string, int32, error) {
 		sharedKeyClient:   shared_key,
 	}
 
-	fmt.Println("Shared Key client:", myKeys.sharedKeyClient," p:",p,"  g:",g," a:",personal_key," b:",b_server_key)
+	fmt.Println("Shared Key client:", myKeys.sharedKeyClient, " p:", p, "  g:", g, " public_key sent to server:", public_key, "  public received:", b_server_key)
 	redis_key := fmt.Sprintf("%s:%s", response.GetNonce(), response.GetServerNonce())
 
 	return myKeys.sharedKeyClient, redis_key, messageidd, nil
@@ -200,7 +211,7 @@ func cleanupBlacklist() {
 	}
 }
 func BizService(redis_key string, message int32, c *gin.Context, userID int32) {
-	fmt.Println(userID, "iddddddddddd")
+	// fmt.Println(userID, "iddddddddddd")
 	grpcAddress := "localhost:50051"
 	conn, err := grpc.Dial(grpcAddress, grpc.WithInsecure())
 	if err != nil {

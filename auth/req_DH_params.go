@@ -94,11 +94,14 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 		Nonce:       req.GetNonce(),
 		ServerNonce: req.GetServerNonce(),
 		MessageId:   req.GetMessageId(),
-		B:           public_key_B.Int64(),
+		B:           public_key_B.String(),
 	}
 
 	//calculate Shared key
-	a_client_key := big.NewInt(req.A)
+	// a_client_key := big.NewInt(req.A)
+	a_client_key := new(big.Int)
+	a_client_key.SetString(req.A, 10)
+
 	// B^a mod p:
 	shared_key := new(big.Int).Exp(public_key_B, a_client_key, p)
 

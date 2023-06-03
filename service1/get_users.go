@@ -144,7 +144,7 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 		return nil, fmt.Errorf("invalid auth_key")
 	} else {
 		log.Printf("authentication: valid auth")
-
+		
 		res := DB.Find(&user, "id = ?", req.UserId)
 		if res.Error != nil || string(user.Id) != string(req.UserId) {
 			// return 100 first users from the table
