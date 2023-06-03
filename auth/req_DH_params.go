@@ -126,7 +126,9 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.DHParamsRequest) (*
 
 	// fmt.Println("personal Key for server:", myKeys.personalKeyServer)
 	// fmt.Println("Public Key for server:", myKeys.publicKeyServer)
-	fmt.Println("Shared Key:", myKeys.sharedKeyServer)
+	// fmt.Println("Shared Key:", myKeys.sharedKeyServer)
+	fmt.Println("Shared Key client:", myKeys.sharedKeyServer, " p:", p, "  g:", g, " a:", b, " b:", a_client_key)
+
 	return resp, nil
 }
 

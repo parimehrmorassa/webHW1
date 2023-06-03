@@ -8,6 +8,7 @@ import (
 	"log"
 	"math/big"
 	random1 "math/rand"
+	"strconv"
 	"sync"
 	"time"
 
@@ -153,7 +154,7 @@ func getAuthKey() (*big.Int, string, int32, error) {
 		sharedKeyClient:   shared_key,
 	}
 
-	// fmt.Println("Shared Key client:", myKeys.sharedKeyClient)
+	fmt.Println("Shared Key client:", myKeys.sharedKeyClient," p:",p,"  g:",g," a:",personal_key," b:",b_server_key)
 	redis_key := fmt.Sprintf("%s:%s", response.GetNonce(), response.GetServerNonce())
 
 	return myKeys.sharedKeyClient, redis_key, messageidd, nil
@@ -198,7 +199,8 @@ func cleanupBlacklist() {
 		blacklistMu.Unlock()
 	}
 }
-func BizService(redis_key string, message int32, c *gin.Context) {
+func BizService(redis_key string, message int32, c *gin.Context, userID int32) {
+	fmt.Println(userID, "iddddddddddd")
 	grpcAddress := "localhost:50051"
 	conn, err := grpc.Dial(grpcAddress, grpc.WithInsecure())
 	if err != nil {
@@ -208,7 +210,7 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 	client := grpcService_get_users.NewGetUsersClient(conn)
 
 	request := &grpcService_get_users.GetDataRequest{
-		UserId:    1,
+		UserId:    userID,
 		AuthKey:   AuthKey_get.Bytes(),
 		MessageId: message,
 		RedisKey:  redis_key,
@@ -243,18 +245,17 @@ func BizService(redis_key string, message int32, c *gin.Context) {
 	}
 
 }
-func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context) {
+func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context, userID string) {
 	grpcAddress := "localhost:50053"
 	conn, err := grpc.Dial(grpcAddress, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("Failed to connect to gRPC server: %v", err)
 	}
 	defer conn.Close()
-	fmt.Println("+++++++++++++++++++++++++++++")
 
 	client := get_user_injection.NewGetUsersInjectClient(conn)
 	request := &get_user_injection.GetDataRequestInject{
-		UserId:    "1",
+		UserId:    userID,
 		AuthKey:   AuthKey_get.Bytes(),
 		MessageId: message,
 		RedisKey:  redis_key,
@@ -293,7 +294,13 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context) {
 
 }
 func gatewayHandler(c *gin.Context) {
+	userIDStr := c.Param("user_id")
 
+	userID, err1 := strconv.ParseInt(userIDStr, 10, 32)
+	if err1 != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
+		return
+	}
 	x, redis_key, message, y := getAuthKey()
 	AuthKey_get = x
 	err := y
@@ -302,12 +309,13 @@ func gatewayHandler(c *gin.Context) {
 	}
 
 	// Connect to the get_users service
-	BizService(redis_key, message, c)
+	BizService(redis_key, message, c, int32(userID))
 	//////////////////////////
 
 }
 
 func gatewayHandlerSqlInject(c *gin.Context) {
+	userID := c.Param("user_id")
 
 	x, redis_key, message, y := getAuthKey()
 	AuthKey_get = x
@@ -317,8 +325,7 @@ func gatewayHandlerSqlInject(c *gin.Context) {
 	}
 
 	// Connect to the get_users_with_sql_inject service
-
-	BizServiceWithSqlInject(redis_key, message, c)
+	BizServiceWithSqlInject(redis_key, message, c, userID)
 	//////////////////////////
 }
 func main() {
@@ -326,7 +333,9 @@ func main() {
 	go cleanupBlacklist()
 	// router.Use(authenticateIP)
 
-	router.GET("/gateway/get_users", gatewayHandler)
-	router.GET("/gateway/get_users_with_sql_inject", gatewayHandlerSqlInject)
+	router.GET("/gateway/get_users/:user_id", gatewayHandler)
+
+	// router.GET("/gateway/get_users", gatewayHandler)
+	router.GET("/gateway/get_users_with_sql_inject/:user_id", gatewayHandlerSqlInject)
 	router.Run(":8080")
 }

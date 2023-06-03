@@ -139,7 +139,7 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 	}
 	authKey := new(big.Int)
 	authKey.SetBytes(req.AuthKey)
-
+	fmt.Println("client: ", authKey, "  server: ", response)
 	if authKey.Cmp(response) != 0 {
 		return nil, fmt.Errorf("invalid auth_key")
 	} else {
