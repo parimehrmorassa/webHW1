@@ -357,7 +357,7 @@ func authenticateIP(c *gin.Context) {
 
 func resetRequestCount() {
 	for {
-		time.Sleep(1 * time.Second) //to count just for each second
+		time.Sleep(1 * time.Second) //to count just for each second  //time.Millisecond
 		ipDataMu.Lock()
 		for _, data := range ipData {
 			if time.Since(data.LastRequest) >= time.Second {
