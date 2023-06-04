@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+option go_package = "/DH_params";
+
+message DHParamsRequest {
+  string nonce        = 1;
+  string server_nonce = 2;
+  int32  message_id   = 3;
+  string  a            = 4;
+}
+
+message DHParamsResponse {
+  string nonce        = 1;
+  string server_nonce = 2;
+  int32  message_id   = 3;
+  string  b            = 4;
+
+}
+
+
+
+service DHParamsService {
+  rpc ProcessRequest (DHParamsRequest) returns (DHParamsResponse);
+}
