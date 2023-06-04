@@ -17,7 +17,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	DH_params "github.com/royadaneshi/webHW1/auth/DH_params"
-	Auth_service "github.com/royadaneshi/webHW1/auth/authservice"
+	Auth_service "github.com/royadaneshi/webHW1/auth/docker1/authservice"
 
 	grpcService_get_users "github.com/royadaneshi/webHW1/service1/get_user/pb"
 
