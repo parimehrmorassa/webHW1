@@ -19,7 +19,7 @@ import (
 	DH_params "github.com/royadaneshi/webHW1/auth/DH_params"
 	Auth_service "github.com/royadaneshi/webHW1/auth/docker1/authservice"
 
-	grpcService_get_users "github.com/royadaneshi/webHW1/Biz/service1/get_user/pb"
+	grpcService_get_users "github.com/royadaneshi/webHW1/Biz/service1/get_userss/pb"
 
 	get_user_injection "github.com/royadaneshi/webHW1/Biz/service2/get_users_with_sql_inject_proto/pb"
 	"google.golang.org/grpc"
