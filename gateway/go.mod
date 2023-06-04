@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gin-gonic/gin v1.9.1
-	github.com/royadaneshi/webHW1/auth v0.0.0-20230603185933-8b812cba60ad
+	github.com/royadaneshi/webHW1/auth v0.0.0-20230604105531-095f1ab12263
 	github.com/royadaneshi/webHW1/service1 v0.0.0-20230602141934-bf33f18e3362
 	github.com/royadaneshi/webHW1/service2 v0.0.0-20230602140044-aa8aba7a1219
 	google.golang.org/grpc v1.55.0
@@ -27,6 +27,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
+	github.com/royadaneshi/webHW1/auth/docker1 v0.0.0-20230604131224-ce0d0087c360 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
