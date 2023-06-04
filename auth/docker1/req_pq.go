@@ -34,7 +34,7 @@ func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyR
 	if req.MessageId%2 != 0 || req.MessageId <= 0 {
 		return nil, fmt.Errorf("Invalid message ID")
 	}
-	fmt.println()
+
 	if len(req.Nonce) != 20 {
 		return nil, fmt.Errorf("Invalid nonce length")
 	}

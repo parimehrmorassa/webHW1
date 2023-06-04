@@ -12,10 +12,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	pb "github.com/royadaneshi/webHW1/auth/docker1/authservice"
+	pb "github.com/royadaneshi/webHW1/auth/authservice"
 	"google.golang.org/grpc"
-
-
 )
 
 type server struct {
@@ -31,7 +29,6 @@ func generateOddNumber() int32 {
 		}
 	}
 }
-
 
 func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyResponse, error) {
 	if req.MessageId%2 != 0 || req.MessageId <= 0 {
