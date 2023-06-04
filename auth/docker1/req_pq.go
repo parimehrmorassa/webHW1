@@ -12,10 +12,8 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	pb "github.com/royadaneshi/webHW1/auth/authservice"
+	pb "github.com/royadaneshi/webHW1/auth/docker1/authservice"
 	"google.golang.org/grpc"
-
-
 )
 
 type server struct {
@@ -32,11 +30,11 @@ func generateOddNumber() int32 {
 	}
 }
 
-
 func (s *server) ProcessRequest(ctx context.Context, req *pb.MyRequest) (*pb.MyResponse, error) {
 	if req.MessageId%2 != 0 || req.MessageId <= 0 {
 		return nil, fmt.Errorf("Invalid message ID")
 	}
+	fmt.println()
 	if len(req.Nonce) != 20 {
 		return nil, fmt.Errorf("Invalid nonce length")
 	}
