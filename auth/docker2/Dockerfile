@@ -1,14 +1,14 @@
-# Use a golang base image
+# Dockerfile for the second service (req_DH_params.go)
 FROM golang:1.16-alpine
 
-# Set the working directory
 WORKDIR /app
 
-# Copy the source code into the container
-COPY req_DH_params.go .
+COPY . .
 
-# Build the Go application
-RUN go build -o req_DH_params
+RUN go build -o req_DH_params req_DH_params.go
 
-# Set the entry point command
+EXPOSE 50054
+
+CMD ["./req_DH_params"]
+
 CMD ["./req_DH_params"]

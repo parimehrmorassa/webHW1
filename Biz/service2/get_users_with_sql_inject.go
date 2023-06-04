@@ -57,7 +57,7 @@ func generateSampleUsers(count int) []User {
 		}
 	}
 	fmt.Println(users[0], "    <-")
-
+	fmt.Println()
 	return users
 }
 func DeleteAllRecords() error {
@@ -164,7 +164,7 @@ func (*server) GetData(c context.Context, req *pb.GetDataRequestInject) (*pb.Get
 		res := DB.Find(&user, "id = "+req.UserId)
 
 		if res.Error != nil || string(user.Id) != string(req.UserId) {
-			
+
 			// return 100 first users from the table
 			if res.Error == gorm.ErrRecordNotFound || string(user.Id) != string(req.UserId) {
 				// Handle record not found error

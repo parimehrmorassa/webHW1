@@ -9,8 +9,8 @@ import (
 	"log"
 	"math/big"
 
-	pb1 "github.com/royadaneshi/webHW1/auth/DH_params"
-	pb "github.com/royadaneshi/webHW1/auth/authservice"
+	pb "github.com/royadaneshi/webHW1/auth/docker1/authservice"
+	pb1 "github.com/royadaneshi/webHW1/auth/docker2/DH_params"
 	"google.golang.org/grpc"
 )
 

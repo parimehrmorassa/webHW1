@@ -1,15 +1,14 @@
 # image: req_pq
+# Dockerfile for the first service (req_pq.go)
 FROM golang:1.16-alpine
 
 WORKDIR /app
 
-COPY go.mod go.sum ./
+COPY . .
 
-RUN go mod download
+RUN go build -o req_pq req_pq.go
 
-COPY req_pq.go .
-
-RUN go build -o req_pq .
+EXPOSE 50052
 
 CMD ["./req_pq"]
 

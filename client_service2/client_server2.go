@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	pb "github.com/royadaneshi/webHW1/service2/get_users_with_sql_inject_proto/pb"
+	pb "github.com/royadaneshi/webHW1/Biz/service2/get_users_with_sql_inject_proto/pb"
 
 	"google.golang.org/grpc"
 )
