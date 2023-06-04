@@ -83,6 +83,18 @@ func DatabaseConnection() {
 	if err != nil {
 		log.Fatal("Error connecting to the database...", err)
 	}
+
+	// Check if the table exists
+	tableExists := DB.Migrator().HasTable(&User{})
+	if !tableExists {
+		// Create the table with desired columns
+		err := DB.AutoMigrate(&User{})
+		if err != nil {
+			log.Fatal("Error creating table:", err)
+		}
+		fmt.Println("Table created successfully.")
+	}
+
 	// Check if the table is empty
 	var count int64
 	DB.Model(&User{}).Count(&count)
