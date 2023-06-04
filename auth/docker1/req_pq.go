@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	pb "github.com/royadaneshi/webHW1/auth/docker1/authservice"
+	pb "github.com/royadaneshi/webHW1/auth/authservice"
 	"google.golang.org/grpc"
 
 

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "/authservice";
+
+message MyRequest {
+  int32 message_id = 1;
+  string nonce = 2;
+}
+
+message MyResponse {
+    string nonce = 1;
+    string  server_nonce = 2;
+    int32 message_id = 3;
+    string p = 4;
+    string g = 5;
+
+}
+
+service MyService {
+  rpc ProcessRequest (MyRequest) returns (MyResponse);
+}
