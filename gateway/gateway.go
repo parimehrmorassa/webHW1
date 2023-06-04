@@ -31,8 +31,8 @@ type IPData struct {
 }
 
 const (
-	MaxRequestsPerSecond = 2                //100
-	BanDuration          = 10 * time.Second //24 * time.Hour
+	MaxRequestsPerSecond = 100            //1
+	BanDuration          = 24 * time.Hour //10 * time.Second
 )
 
 var (
@@ -200,7 +200,7 @@ func BizService(redis_key string, message int32, c *gin.Context, userID int32) {
 
 	if response.MessageId == 1 {
 		user := response.ReturnUsers[0]
-		fmt.Println("User ID: %d\n", user.Id)
+		fmt.Println("User ID: ", user.Id)
 		fmt.Printf("Name: %s\n", user.Name)
 		fmt.Printf("Family: %s\n", user.Family)
 		fmt.Printf("Age: %d\n", user.Age)
@@ -208,7 +208,7 @@ func BizService(redis_key string, message int32, c *gin.Context, userID int32) {
 		fmt.Printf("Created At: %s\n", user.CreatedAt)
 	} else if response.MessageId == 3 {
 		for _, user := range response.ReturnUsers {
-			fmt.Printf("User ID: %d\n", user.Id)
+			fmt.Printf("User ID: ", user.Id)
 			fmt.Printf("Name: %s\n", user.Name)
 			fmt.Printf("Family: %s\n", user.Family)
 			fmt.Printf("Age: %d\n", user.Age)
@@ -246,7 +246,7 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context, us
 
 	if response.MessageId == 1 {
 		user := response.ReturnUsers[0]
-		fmt.Println("User ID: %d\n", user.Id)
+		fmt.Println("User ID: ", user.Id)
 		fmt.Printf("Name: %s\n", user.Name)
 		fmt.Printf("Family: %s\n", user.Family)
 		fmt.Printf("Age: %d\n", user.Age)
@@ -254,7 +254,7 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context, us
 		fmt.Printf("Created At: %s\n", user.CreatedAt)
 	} else if response.MessageId == 3 {
 		for _, user := range response.ReturnUsers {
-			fmt.Printf("User ID: %d\n", user.Id)
+			fmt.Printf("User ID: ", user.Id)
 			fmt.Printf("Name: %s\n", user.Name)
 			fmt.Printf("Family: %s\n", user.Family)
 			fmt.Printf("Age: %d\n", user.Age)
@@ -266,12 +266,10 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context, us
 		fmt.Println("Unknown response from server")
 	}
 
-	////////////////////////////////////////////////////////////
-
 }
+
 func gatewayHandler(c *gin.Context) {
 	userIDStr := c.Param("user_id")
-
 	userID, err1 := strconv.ParseInt(userIDStr, 10, 32)
 	if err1 != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user_id"})
@@ -283,16 +281,19 @@ func gatewayHandler(c *gin.Context) {
 	if err != nil {
 		log.Fatalf("Failed to get the auth key: %v", err)
 	}
-
+	if c.Writer.Status() == http.StatusTooManyRequests {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too Many Requests"})
+		return
+	} else if c.Writer.Status() == http.StatusForbidden {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+		return
+	}
 	// Connect to the get_users service
 	BizService(redis_key, message, c, int32(userID))
-	//////////////////////////
-
 }
 
 func gatewayHandlerSqlInject(c *gin.Context) {
 	userID := c.Param("user_id")
-
 	x, redis_key, message, y := getAuthKey()
 	AuthKey_get = x
 	err := y
@@ -300,12 +301,32 @@ func gatewayHandlerSqlInject(c *gin.Context) {
 		log.Fatalf("Failed to get the auth key: %v", err)
 	}
 
+	if c.Writer.Status() == http.StatusTooManyRequests {
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too Many Requests"})
+		return
+	} else if c.Writer.Status() == http.StatusForbidden {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+		return
+	}
+
 	// Connect to the get_users_with_sql_inject service
 	BizServiceWithSqlInject(redis_key, message, c, userID)
-	//////////////////////////
 }
+
 func authenticateIP(c *gin.Context) {
 	ip := c.ClientIP()
+	// Check if the IP is blacklisted
+	blacklistMu.Lock()
+	if banTime, ok := blacklist[ip]; ok {
+		if banTime.After(time.Now()) {
+			c.AbortWithStatus(http.StatusForbidden)
+			c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
+			blacklistMu.Unlock()
+			return
+		}
+		delete(blacklist, ip)
+	}
+	blacklistMu.Unlock()
 
 	ipDataMu.Lock()
 	if _, ok := ipData[ip]; !ok {
@@ -324,6 +345,8 @@ func authenticateIP(c *gin.Context) {
 		blacklist[ip] = time.Now().Add(BanDuration)
 		blacklistMu.Unlock()
 		c.AbortWithStatus(http.StatusTooManyRequests)
+		c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too Many Requests"})
+		ipDataMu.Unlock()
 		return
 	}
 	data.LastRequest = time.Now()
@@ -331,11 +354,10 @@ func authenticateIP(c *gin.Context) {
 
 	c.Next()
 }
+
 func resetRequestCount() {
 	for {
-		time.Sleep(1 * time.Second)
-		fmt.Println("**********")
-
+		time.Sleep(1 * time.Second) //to count just for each second
 		ipDataMu.Lock()
 		for _, data := range ipData {
 			if time.Since(data.LastRequest) >= time.Second {
@@ -348,18 +370,24 @@ func resetRequestCount() {
 
 func cleanupBlacklist() {
 	for {
-		time.Sleep(5 * time.Second)
-		fmt.Println("*----------------------")
-
+		time.Sleep(3 * time.Second)
 		currentTime := time.Now()
-
 		blacklistMu.Lock()
 		for ip, banTime := range blacklist {
 			if banTime.Before(currentTime) {
+				fmt.Println("remove from blacklist  --ip:  ", ip)
 				delete(blacklist, ip)
 			}
 		}
 		blacklistMu.Unlock()
+
+		ipDataMu.Lock()
+		for ip, data := range ipData {
+			if data.LastRequest.Add(BanDuration).Before(currentTime) {
+				delete(ipData, ip)
+			}
+		}
+		ipDataMu.Unlock()
 	}
 }
 
@@ -372,7 +400,6 @@ func main() {
 
 	router.GET("/gateway/get_users/:user_id", gatewayHandler)
 
-	// router.GET("/gateway/get_users", gatewayHandler)
 	router.GET("/gateway/get_users_with_sql_inject/:user_id", gatewayHandlerSqlInject)
 	router.Run(":8080")
 }
