@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "get_user/pb";
+option go_package = "get_userss/pb";
 
 service get_users {
   rpc GetData(GetDataRequest) returns (GetDataResponse) {}

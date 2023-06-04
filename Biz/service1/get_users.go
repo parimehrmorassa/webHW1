@@ -11,7 +11,7 @@ import (
 	"time"
 
 	"github.com/go-redis/redis/v8"
-	pb "github.com/royadaneshi/webHW1/Biz/service1/get_user/pb"
+	pb "github.com/royadaneshi/webHW1/Biz/service1/get_userss/pb"
 
 	"google.golang.org/grpc"
 	"gorm.io/driver/postgres"
