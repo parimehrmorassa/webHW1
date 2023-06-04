@@ -46,6 +46,8 @@ github.com/pelletier/go-toml/v2 v2.0.8 h1:0ctb6s9mE31h0/lhu+J6OPmVeDxJn+kYnJc2jZ
 github.com/pelletier/go-toml/v2 v2.0.8/go.mod h1:vuYfssBdrU2XDZ9bYydBu6t+6a6PYNcZljzZR9VXg+4=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
+github.com/royadaneshi/webHW1/Biz/service2 v0.0.0-20230604135947-a6edc5d6502d h1:n4nwnyqos/kHsh3qIT6TACL7Zc3dcP5+AXz/Ps7/PGU=
+github.com/royadaneshi/webHW1/Biz/service2 v0.0.0-20230604135947-a6edc5d6502d/go.mod h1:4ovKIE4PuC12ybASRG3hzGDyww6eCAP7OjZlQ6hX548=
 github.com/royadaneshi/webHW1/auth v0.0.0-20230602123352-02113169e278 h1:ndO2XTsQPSPOZ1Bk6PGpt6e4gb07AXzdirl01Cxc+Ms=
 github.com/royadaneshi/webHW1/auth v0.0.0-20230602123352-02113169e278/go.mod h1:ljelW9x+27FOM3G6o6PhiKxVnLK/q+dGTKWzIQyXrpg=
 github.com/royadaneshi/webHW1/auth v0.0.0-20230603142326-1e5d8ec60641 h1:/m4s4jR3VNVmEQeALLSHYvEYdrTCfHlwdcK4QX1xRwI=
