@@ -23,6 +23,9 @@ import (
 
 	get_user_injection "github.com/royadaneshi/webHW1/Biz/service2/get_users_with_sql_inject_proto/pb"
 	"google.golang.org/grpc"
+
+	swagger_files "github.com/swaggo/files"
+	gin_swagger "github.com/swaggo/gin-swagger"
 )
 
 type IPData struct {
@@ -268,6 +271,13 @@ func BizServiceWithSqlInject(redis_key string, message int32, c *gin.Context, us
 
 }
 
+// @Summary Get user by ID
+// @Description Get user information by ID
+// @Tags Users
+// @Accept json
+// @Produce json
+// @Param user_id path int true "user_id"
+// @Router /gateway/get_users/{user_id} [get]
 func gatewayHandler(c *gin.Context) {
 	userIDStr := c.Param("user_id")
 	userID, err1 := strconv.ParseInt(userIDStr, 10, 32)
@@ -292,6 +302,13 @@ func gatewayHandler(c *gin.Context) {
 	BizService(redis_key, message, c, int32(userID))
 }
 
+// @Summary Get user by ID with sql injection
+// @Description Get user information by ID with injection sql
+// @Tags Users_injection_sql
+// @Accept json
+// @Produce json
+// @Param user_id path int true "user_id"
+// @Router /gateway/get_users_with_sql_inject/{user_id} [get]
 func gatewayHandlerSqlInject(c *gin.Context) {
 	userID := c.Param("user_id")
 	x, redis_key, message, y := getAuthKey()
@@ -398,6 +415,7 @@ func main() {
 	go cleanupBlacklist()
 	router.Use(authenticateIP)
 
+	router.GET("/swagger/*any", gin_swagger.WrapHandler(swagger_files.Handler))
 	router.GET("/gateway/get_users/:user_id", gatewayHandler)
 
 	router.GET("/gateway/get_users_with_sql_inject/:user_id", gatewayHandlerSqlInject)
