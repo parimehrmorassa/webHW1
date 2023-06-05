@@ -1,17 +1,11 @@
-# Dockerfile for get_users_with_sql_inject service (service2)
+#get_users_with_sql_inject-service
 FROM golang:1.19-alpine
 
-# Set the working directory inside the container
 WORKDIR /app
+COPY . .
 
-# Copy the service source code
-COPY service2 /app
+RUN go build -o get_users_with_sql_inject get_users_with_sql_inject.go
 
-# Build the service
-RUN go build -o get_users_with_sql_inject .
-
-# Expose the port that the service listens on
 EXPOSE 50053
 
-# Run the service
 CMD ["./get_users_with_sql_inject"]

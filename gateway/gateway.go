@@ -22,8 +22,8 @@ import (
 	grpcService_get_users "github.com/royadaneshi/webHW1/Biz/service1/get_userss/pb"
 
 	get_user_injection "github.com/royadaneshi/webHW1/Biz/service2/get_users_with_sql_inject_proto/pb"
-	swagger_files "github.com/swaggo/files"
-	gin_swagger "github.com/swaggo/gin-swagger"
+	// swagger_files "github.com/swaggo/files"
+	// gin_swagger "github.com/swaggo/gin-swagger"
 	"google.golang.org/grpc"
 )
 
