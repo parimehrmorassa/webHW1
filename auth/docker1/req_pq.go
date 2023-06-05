@@ -103,7 +103,7 @@ func generateNonce() string {
 func main() {
 	// Create a Redis client
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", //redis port its true
+		Addr:     "localhost:6379", //redis port its true //"localhost:6379" 
 		Password: "",               //dafault pass
 		DB:       0,                //default db
 	})

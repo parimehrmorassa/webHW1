@@ -1,5 +1,5 @@
 # Dockerfile for get_users_with_sql_inject service (service2)
-FROM golang:1.16-alpine
+FROM golang:1.19-alpine
 
 # Set the working directory inside the container
 WORKDIR /app

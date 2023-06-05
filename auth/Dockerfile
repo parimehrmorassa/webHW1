@@ -1,16 +1,16 @@
 # Dockerfile for the overall container
-
+#auth-service
 # Build the first service
-FROM golang:1.16-alpine AS build-docker1
+FROM golang:1.19-alpine AS build-docker1
 WORKDIR /app
 COPY docker1/ .
-RUN go build -o req_pq req_pq.go
+RUN go build -o req_pq 
 
 # Build the second service
-FROM golang:1.16-alpine AS build-docker2
+FROM golang:1.19-alpine AS build-docker2
 WORKDIR /app
 COPY docker2/ .
-RUN go build -o req_DH_params req_DH_params.go
+RUN go build -o req_DH_params 
 
 # Final container
 FROM alpine:latest

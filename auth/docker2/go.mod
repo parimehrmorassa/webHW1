@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/go-redis/redis/v8 v8.11.5
-	github.com/royadaneshi/webHW1/auth/docker1 v0.0.0-20230604131224-ce0d0087c360
+	github.com/royadaneshi/webHW1/auth/docker1 v0.0.0-20230605074048-1ffb90450a03
 	google.golang.org/grpc v1.55.0
 	google.golang.org/protobuf v1.30.0
 )

@@ -1,6 +1,6 @@
-# image: req_pq
-# Dockerfile for the first service (req_pq.go)
-FROM golang:1.16-alpine
+# image: req_pq-service
+
+FROM golang:1.19-alpine
 
 WORKDIR /app
 

@@ -1,14 +1,12 @@
-# Dockerfile for the second service (req_DH_params.go)
-FROM golang:1.16-alpine
+# req_pq_dh_params-service
+FROM golang:1.19-alpine
 
 WORKDIR /app
 
 COPY . .
 
-RUN go build -o req_DH_params req_DH_params.go
+RUN go build -o req_DH_params  
 
 EXPOSE 50054
-
-CMD ["./req_DH_params"]
 
 CMD ["./req_DH_params"]
