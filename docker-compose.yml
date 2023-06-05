@@ -1,0 +1,56 @@
+version: '3'
+volumes:
+  db_data:
+  redis_data:
+
+services:
+  auth-services1:
+    build: ./auth/docker1
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  auth_service2:
+    build: ./auth/docker2
+    ports:
+      - "8001:8000"
+    depends_on:
+      - redis
+
+
+
+  Biz_service1:
+    build: ./Biz/service1
+    ports:
+      - "8002:8000"
+    depends_on:
+      - db
+      - redis
+      
+  Biz_service2:
+    build: ./Biz/service2 
+    ports:
+      - "8003:8000"
+    depends_on:
+      - db
+      - redis
+
+  redis:
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data  
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: web_HW1
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+
