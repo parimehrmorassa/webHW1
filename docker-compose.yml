@@ -18,6 +18,8 @@ services:
       - auth_service2
       - biz_service1
       - biz_service2
+      - db
+      - redis
     networks:
       - webhw1_default
 #//////////////////////////////////////////
