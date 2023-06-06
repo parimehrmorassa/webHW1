@@ -4,7 +4,7 @@ volumes:
   redis_data:
 
 networks:
-  default:
+  webhw1_default:
     external:
       name: webhw1_default
 
@@ -14,43 +14,52 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - auth-services1
+      - auth_services1
       - auth_service2
       - biz_service1
       - biz_service2
-    # networks:
-    #   - webhw1_default
-
-  auth-services1:
-    image: authservice1:v1
+    networks:
+      - webhw1_default
+#//////////////////////////////////////////
+  auth_services1:
+    image: authservice1:v2
     ports:
       - "8000:8000"
+    environment:
+      - REDIS_HOST=webhw1_redis_1
+      - REDIS_PORT=6379
     depends_on:
       - redis
-    # networks:
-    #   - webhw1_default
-
+    networks:
+      - webhw1_default
+#//////////////////////////////////////////
   auth_service2:
     image: authservice2:v1
     ports:
       - "8001:8000"
     depends_on:
       - redis
-    # networks:
-    #   - webhw1_default
+    environment:
+      - REDIS_HOST=webhw1_redis_1
+      - REDIS_PORT=6379
+    networks:
+      - webhw1_default
 
-
+#/////////////////////////////////////////
   biz_service1:
-    image: bizservice1:v1
+    image: bizservice1:v2
     ports:
       - "8002:8000"
     depends_on:
       - db
       - redis
-
-    # networks:
-    #   - webhw1_default
-
+    environment:
+      - DB_HOST=db
+      - DB_USER=kamyar
+      - DB_NAME=kamyardb
+    networks:
+      - webhw1_default
+#/////////////////////////////////////////
   biz_service2:
     image: bizservice2:v1
     ports:
@@ -58,8 +67,13 @@ services:
     depends_on:
       - db
       - redis
-    # networks:
-    #   - webhw1_default
+    networks:
+      - webhw1_default
+    environment:
+      - DB_HOST=db
+      - DB_USER=kamyar
+      - DB_NAME=kamyardb
+      
   redis:
     restart: always
     image: redis:latest
@@ -67,14 +81,16 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data  
+    networks:
+      - webhw1_default
 
   db:
     image: postgres
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
-      POSTGRES_DB: web_HW1
+      POSTGRES_USER: kamyar
+      POSTGRES_PASSWORD: Karsanj1380
+      POSTGRES_DB: kamyardb
     volumes:
       - db_data:/var/lib/postgresql/data
-
-
+    networks:
+      - webhw1_default

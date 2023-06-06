@@ -101,11 +101,12 @@ func generateNonce() string {
 }
 
 func main() {
+	
 	// Create a Redis client
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", //redis port its true //"localhost:6379" 
-		Password: "",               //dafault pass
-		DB:       0,                //default db
+		Addr:     "redis:6379", //redis port its true //"localhost:6379"
+		Password: "",           //dafault pass
+		DB:       0,            //default db
 	})
 
 	_, err := redisClient.Ping(context.Background()).Result()
@@ -125,4 +126,5 @@ func main() {
 	if err := s.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
+
 }
