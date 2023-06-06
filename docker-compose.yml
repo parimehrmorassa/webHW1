@@ -10,9 +10,7 @@ networks:
 
 services:
   gateway:
-    build:
-      context: ./gateway
-      dockerfile: Dockerfile
+    image: gateeway:v1
     ports:
       - "80:80"
     depends_on:
