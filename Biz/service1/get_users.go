@@ -117,9 +117,9 @@ func (s *server) GetData(c context.Context, req *pb.GetDataRequest) (*pb.GetData
 	var user User
 	//read redis to get auth key to check validation of the recevied auth key
 	redisClient := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379", //redis port its true
-		Password: "",               //dafault pass
-		DB:       0,                //default db
+		Addr:     "redis:6379", //redis port its true
+		Password: "",           //dafault pass
+		DB:       0,            //default db
 	})
 
 	_, err := redisClient.Ping(context.Background()).Result()

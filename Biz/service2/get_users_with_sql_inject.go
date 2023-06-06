@@ -69,7 +69,7 @@ func DeleteAllRecords() error {
 	return nil
 }
 func DatabaseConnection() {
-	host := "localhost"
+	host := "webhw1_db_1"
 	port := 5432
 	user := "postgres"
 	password := "web14022"
