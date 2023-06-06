@@ -11,7 +11,7 @@ networks:
 services:
   gateway:
     build:
-      context: .
+      context: ./gateway
       dockerfile: Dockerfile
     ports:
       - "80:80"
@@ -20,8 +20,8 @@ services:
       - auth_service2
       - biz_service1
       - biz_service2
-    networks:
-      - webhw1_default
+    # networks:
+    #   - webhw1_default
 
   auth-services1:
     image: authservice1:v1
@@ -29,8 +29,8 @@ services:
       - "8000:8000"
     depends_on:
       - redis
-    networks:
-      - webhw1_default
+    # networks:
+    #   - webhw1_default
 
   auth_service2:
     image: authservice2:v1
@@ -38,8 +38,8 @@ services:
       - "8001:8000"
     depends_on:
       - redis
-    networks:
-      - webhw1_default
+    # networks:
+    #   - webhw1_default
 
 
   biz_service1:
@@ -50,8 +50,8 @@ services:
       - db
       - redis
 
-    networks:
-      - webhw1_default
+    # networks:
+    #   - webhw1_default
 
   biz_service2:
     image: bizservice2:v1
@@ -60,8 +60,8 @@ services:
     depends_on:
       - db
       - redis
-    networks:
-      - webhw1_default
+    # networks:
+    #   - webhw1_default
   redis:
     restart: always
     image: redis:latest
