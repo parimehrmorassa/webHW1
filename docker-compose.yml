@@ -47,7 +47,7 @@ services:
 
 #/////////////////////////////////////////
   biz_service1:
-    image: bizservice1:v2
+    image: bizservice1:v5
     ports:
       - "8002:8000"
     depends_on:
@@ -61,7 +61,7 @@ services:
       - webhw1_default
 #/////////////////////////////////////////
   biz_service2:
-    image: bizservice2:v1
+    image: bizservice2:v4
     ports:
       - "8003:8000"
     depends_on:
@@ -88,7 +88,7 @@ services:
     image: postgres
     environment:
       POSTGRES_USER: kamyar
-      POSTGRES_PASSWORD: Karsanj1380
+      POSTGRES_PASSWORD: karsanj1380
       POSTGRES_DB: kamyardb
     volumes:
       - db_data:/var/lib/postgresql/data

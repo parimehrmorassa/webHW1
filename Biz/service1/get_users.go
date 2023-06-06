@@ -69,11 +69,11 @@ func DeleteAllRecords() error {
 	return nil
 }
 func DatabaseConnection() {
-	host := "webhw1_db_1"
+	host := "db"
 
 	port := 5432
 	user := "kamyar"
-	password := "Karsanj1380"
+	password := "karsanj1380"
 	dbName := "kamyardb"
 
 	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
