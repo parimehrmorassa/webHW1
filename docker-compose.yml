@@ -3,39 +3,65 @@ volumes:
   db_data:
   redis_data:
 
+networks:
+  default:
+    external:
+      name: webhw1_default
+
 services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - auth-services1
+      - auth_service2
+      - biz_service1
+      - biz_service2
+    networks:
+      - webhw1_default
+
   auth-services1:
-    build: ./auth/docker1
+    image: authservice1:v1
     ports:
       - "8000:8000"
     depends_on:
       - redis
+    networks:
+      - webhw1_default
 
   auth_service2:
-    build: ./auth/docker2
+    image: authservice2:v1
     ports:
       - "8001:8000"
     depends_on:
       - redis
+    networks:
+      - webhw1_default
 
 
-
-  Biz_service1:
-    build: ./Biz/service1
+  biz_service1:
+    image: bizservice1:v1
     ports:
       - "8002:8000"
     depends_on:
       - db
       - redis
-      
-  Biz_service2:
-    build: ./Biz/service2 
+
+    networks:
+      - webhw1_default
+
+  biz_service2:
+    image: bizservice2:v1
     ports:
       - "8003:8000"
     depends_on:
       - db
       - redis
-
+    networks:
+      - webhw1_default
   redis:
     restart: always
     image: redis:latest
