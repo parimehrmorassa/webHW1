@@ -1,11 +1,19 @@
-FROM golang:1.19
+# image: req_pq-service
+
+FROM golang:1.19-alpine
+
 WORKDIR /app
 
-COPY . .
+COPY go.mod go.sum ./ 
 
-RUN go build -o gateway gateway.go 
+RUN go mod download
 
-# EXPOSE 8080
+RUN CGO_ENABLED=0 GOOS=linux go build -o /docker-gs-ping
+
+# RUN go build -o req_pq req_pq.go
+
 EXPOSE 6433
-CMD ["./gateway"]
+
+CMD ["/docker-gs-ping"]
+
 
